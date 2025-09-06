@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page Title -->
+    <title>Online Timer – Free Countdown & Stopwatch</title>
+
+    <!-- Meta Description (shows in Google results) -->
+    <meta name="description" content="Use this free online timer for countdowns and stopwatches. Simple, fast, and accessible from any device.">
+
+    <!-- Keywords (Google ignores mostly, but some engines still use them) -->
+    <meta name="keywords" content="online timer, countdown timer, stopwatch, productivity, study timer, kitchen timer">
+
+    <!-- Open Graph (social sharing: Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="Online Timer – Free Countdown & Stopwatch">
+    <meta property="og:description" content="A simple and free online timer for countdowns and stopwatches. Accessible anywhere.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://brdrz.github.io/timers/">
+    <meta property="og:image" content="https://brdrz.github.io/timers/timer-preview.png">
+
+    <!-- Twitter Card (social sharing: Twitter/X) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Online Timer – Free Countdown & Stopwatch">
+    <meta name="twitter:description" content="Use this free online timer for countdowns and stopwatches. Simple, fast, and accessible from any device.">
+    <meta name="twitter:image" content="https://brdrz.github.io/timers/timer-preview.png">
+
+    <!-- Favicon (browser tab icon) -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .timer-card {
+            min-width: 280px;
+            transition: border-color 0.3s ease-in-out;
+        }
+        .timer-display.flash-red {
+            color: #ef4444;
+        }
+        .timer-card.flash-red-border {
+            border-color: #ef4444;
+        }
+        .timer-input-group input {
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .timer-input-group input::-webkit-outer-spin-button,
+        .timer-input-group input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+    <!-- Tone.js CDN for audible alarms -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58/build/Tone.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+
+    <div class="bg-white rounded-3xl shadow-xl p-8 max-w-7xl w-full mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight">
+                Online Timer and Stopwatch
+            </h1>
+            <p class="mt-2 text-lg text-gray-500">
+                Customizable timers for any task.
+            </p>
+        </header>
+
+        <!-- Timers Grid Container -->
+        <div id="timers-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Timer 1 -->
+            <div id="timer-1" class="timer-card bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-200 flex flex-col items-center">
+                <input type="text" value="Timer 1" class="timer-name w-full text-center text-xl font-bold text-gray-700 bg-transparent mb-3 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 rounded-sm">
+                
+                <div class="timer-input-group flex justify-center items-center my-4 space-x-2 w-full text-gray-900 font-mono font-bold text-3xl md:text-4xl">
+                    <input type="number" min="0" value="0" class="timer-input-hour w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-minute w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-second w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                </div>
+                
+                <div class="flex flex-wrap justify-center space-x-2 mb-2">
+                    <button class="timer-btn-add-hour bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Hr
+                    </button>
+                    <button class="timer-btn-add-minute bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Min
+                    </button>
+                    <button class="timer-btn-add-second bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Sec
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center space-x-2 mt-2">
+                    <button class="timer-btn-toggle bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Start</button>
+                    <button class="timer-btn-reset bg-gray-700 hover:bg-gray-800 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Timer 2 -->
+            <div id="timer-2" class="timer-card bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-200 flex flex-col items-center">
+                <input type="text" value="Timer 2" class="timer-name w-full text-center text-xl font-bold text-gray-700 bg-transparent mb-3 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 rounded-sm">
+                
+                <div class="timer-input-group flex justify-center items-center my-4 space-x-2 w-full text-gray-900 font-mono font-bold text-3xl md:text-4xl">
+                    <input type="number" min="0" value="0" class="timer-input-hour w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-minute w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-second w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                </div>
+                
+                <div class="flex flex-wrap justify-center space-x-2 mb-2">
+                    <button class="timer-btn-add-hour bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Hr
+                    </button>
+                    <button class="timer-btn-add-minute bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Min
+                    </button>
+                    <button class="timer-btn-add-second bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Sec
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center space-x-2 mt-2">
+                    <button class="timer-btn-toggle bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Start</button>
+                    <button class="timer-btn-reset bg-gray-700 hover:bg-gray-800 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Timer 3 -->
+            <div id="timer-3" class="timer-card bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-200 flex flex-col items-center">
+                <input type="text" value="Timer 3" class="timer-name w-full text-center text-xl font-bold text-gray-700 bg-transparent mb-3 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 rounded-sm">
+                
+                <div class="timer-input-group flex justify-center items-center my-4 space-x-2 w-full text-gray-900 font-mono font-bold text-3xl md:text-4xl">
+                    <input type="number" min="0" value="0" class="timer-input-hour w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-minute w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-second w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                </div>
+                
+                <div class="flex flex-wrap justify-center space-x-2 mb-2">
+                    <button class="timer-btn-add-hour bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Hr
+                    </button>
+                    <button class="timer-btn-add-minute bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Min
+                    </button>
+                    <button class="timer-btn-add-second bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Sec
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center space-x-2 mt-2">
+                    <button class="timer-btn-toggle bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Start</button>
+                    <button class="timer-btn-reset bg-gray-700 hover:bg-gray-800 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Timer 4 -->
+            <div id="timer-4" class="timer-card bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-200 flex flex-col items-center">
+                <input type="text" value="Timer 4" class="timer-name w-full text-center text-xl font-bold text-gray-700 bg-transparent mb-3 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 rounded-sm">
+                
+                <div class="timer-input-group flex justify-center items-center my-4 space-x-2 w-full text-gray-900 font-mono font-bold text-3xl md:text-4xl">
+                    <input type="number" min="0" value="0" class="timer-input-hour w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-minute w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-second w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                </div>
+                
+                <div class="flex flex-wrap justify-center space-x-2 mb-2">
+                    <button class="timer-btn-add-hour bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Hr
+                    </button>
+                    <button class="timer-btn-add-minute bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Min
+                    </button>
+                    <button class="timer-btn-add-second bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Sec
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center space-x-2 mt-2">
+                    <button class="timer-btn-toggle bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Start</button>
+                    <button class="timer-btn-reset bg-gray-700 hover:bg-gray-800 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        Reset
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Timer 5 -->
+            <div id="timer-5" class="timer-card bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-200 flex flex-col items-center">
+                <input type="text" value="Timer 5" class="timer-name w-full text-center text-xl font-bold text-gray-700 bg-transparent mb-3 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 rounded-sm">
+                
+                <div class="timer-input-group flex justify-center items-center my-4 space-x-2 w-full text-gray-900 font-mono font-bold text-3xl md:text-4xl">
+                    <input type="number" min="0" value="0" class="timer-input-hour w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-minute w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-second w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                </div>
+                
+                <div class="flex flex-wrap justify-center space-x-2 mb-2">
+                    <button class="timer-btn-add-hour bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Hr
+                    </button>
+                    <button class="timer-btn-add-minute bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Min
+                    </button>
+                    <button class="timer-btn-add-second bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Sec
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center space-x-2 mt-2">
+                    <button class="timer-btn-toggle bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Start</button>
+                    <button class="timer-btn-reset bg-gray-700 hover:bg-gray-800 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Timer 6 -->
+            <div id="timer-6" class="timer-card bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-200 flex flex-col items-center">
+                <input type="text" value="Timer 6" class="timer-name w-full text-center text-xl font-bold text-gray-700 bg-transparent mb-3 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 rounded-sm">
+                
+                <div class="timer-input-group flex justify-center items-center my-4 space-x-2 w-full text-gray-900 font-mono font-bold text-3xl md:text-4xl">
+                    <input type="number" min="0" value="0" class="timer-input-hour w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-minute w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                    <span class="text-gray-500">:</span>
+                    <input type="number" min="0" max="59" value="0" class="timer-input-second w-1/3 p-2 text-center rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300">
+                </div>
+                
+                <div class="flex flex-wrap justify-center space-x-2 mb-2">
+                    <button class="timer-btn-add-hour bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Hr
+                    </button>
+                    <button class="timer-btn-add-minute bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Min
+                    </button>
+                    <button class="timer-btn-add-second bg-gray-400 hover:bg-gray-500 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        +1 Sec
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center space-x-2 mt-2">
+                    <button class="timer-btn-toggle bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Start</button>
+                    <button class="timer-btn-reset bg-gray-700 hover:bg-gray-800 text-white font-semibold text-sm py-2 px-3 rounded-full transition duration-300 ease-in-out">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="max-w-4xl mx-auto my-12 p-8 bg-gray-50 rounded-2xl shadow-inner">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">About Our Multi-Timer Dashboard</h2>
+            <p class="text-lg text-gray-600 text-center mb-6">
+                Welcome to the free online timer! Our multi-timer dashboard allows you to manage up to six
+                simultaneous countdowns or stopwatches directly in your browser. It's a simple, fast, and
+                powerful tool for staying on track with multiple tasks.
+            </p>
+        
+            <h3 class="text-2xl font-semibold text-gray-700 mb-3">How to Use the Timers</h3>
+            <ul class="list-disc list-inside space-y-2 text-left text-gray-600 max-w-xl mx-auto">
+                <li><strong>Customize:</strong> Easily rename each timer to fit your specific task.</li>
+                <li><strong>Set Time:</strong> Use the dedicated buttons to add hours, minutes, and seconds for a precise countdown.</li>
+                <li><strong>Start/Stop:</strong> Click the "Start" button to begin timing, or "Stop" to pause.</li>
+                <li><strong>Reset:</strong> The "Reset" button will return the timer to zero and stop any ongoing alarm.</li>
+            </ul>
+        
+            <h3 class="text-2xl font-semibold text-gray-700 mt-6 mb-3">Why Use a Multi-Timer?</h3>
+            <p class="text-lg text-gray-600 text-center">
+                Whether you're juggling multiple cooking items, managing different study intervals, or tracking a complex workout routine,
+                this dashboard helps you stay organized. It's designed to be lightweight, distraction-free, and always available on any device.
+            </p>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-8 text-gray-400 text-sm">
+        <p></p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // An array to hold the state for each timer.
+            const timers = [
+                { id: 1, name: "Timer 1", time: 0, interval: null, flashingInterval: null, alarmInterval: null, isRunning: false, isAlarming: false, isCountdown: true },
+                { id: 2, name: "Timer 2", time: 0, interval: null, flashingInterval: null, alarmInterval: null, isRunning: false, isAlarming: false, isCountdown: true },
+                { id: 3, name: "Timer 3", time: 0, interval: null, flashingInterval: null, alarmInterval: null, isRunning: false, isAlarming: false, isCountdown: true },
+                { id: 4, name: "Timer 4", time: 0, interval: null, flashingInterval: null, alarmInterval: null, isRunning: false, isAlarming: false, isCountdown: true },
+                { id: 5, name: "Timer 5", time: 0, interval: null, flashingInterval: null, alarmInterval: null, isRunning: false, isAlarming: false, isCountdown: true },
+                { id: 6, name: "Timer 6", time: 0, interval: null, flashingInterval: null, alarmInterval: null, isRunning: false, isAlarming: false, isCountdown: true },
+            ];
+            
+            const timersContainer = document.getElementById('timers-container');
+            let audioStarted = false;
+            let lastVisibilityChangeTime = null;
+
+            // Function to play a single high-pitched chime
+            function playSingleChime() {
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                const synth = new Tone.Synth({
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }
+                }).toDestination();
+                synth.triggerAttackRelease("C6", "8n");
+            }
+
+            // Function to play a triplet of chimes
+            function playChimeTriplet() {
+                playSingleChime();
+                setTimeout(() => playSingleChime(), 250);
+                setTimeout(() => playSingleChime(), 500);
+            }
+
+            // Function to start the repeating triplet alarm
+            function startAlarmTriplets(timerId) {
+                const timer = timers.find(t => t.id === timerId);
+                timer.isAlarming = true;
+                playChimeTriplet();
+                timer.alarmInterval = setInterval(() => {
+                    playChimeTriplet();
+                }, 1000);
+            }
+
+            // Helper function to format seconds into HH:MM:SS format
+            function formatTime(seconds) {
+                const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const s = String(seconds % 60).padStart(2, '0');
+                return { h, m, s };
+            }
+
+            // Function to update the display for a specific timer
+            function updateDisplay(timerId) {
+                const timerElement = document.getElementById(`timer-${timerId}`);
+                if (timerElement) {
+                    const timer = timers.find(t => t.id === timerId);
+                    const { h, m, s } = formatTime(Math.max(0, timer.time));
+                    timerElement.querySelector('.timer-input-hour').value = h;
+                    timerElement.querySelector('.timer-input-minute').value = m;
+                    timerElement.querySelector('.timer-input-second').value = s;
+                }
+            }
+            
+            // Function to handle the start/stop button state and card border
+            function setToggleButton(timerCard, isRunning, isAlarming) {
+                const button = timerCard.querySelector('.timer-btn-toggle');
+                const inputs = timerCard.querySelectorAll('.timer-input-group input');
+
+                if (isAlarming) {
+                    button.textContent = 'Stop Alarm';
+                    button.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                    button.classList.add('bg-red-500', 'hover:bg-red-600');
+                    inputs.forEach(input => input.readOnly = true);
+                } else if (isRunning) {
+                    button.textContent = 'Stop';
+                    button.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                    button.classList.add('bg-red-500', 'hover:bg-red-600');
+                    timerCard.classList.remove('border-gray-200');
+                    timerCard.classList.add('border-green-500');
+                    inputs.forEach(input => input.readOnly = true);
+                } else {
+                    button.textContent = 'Start';
+                    button.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    button.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                    timerCard.classList.remove('border-green-500');
+                    timerCard.classList.add('border-gray-200');
+                    inputs.forEach(input => input.readOnly = false);
+                }
+            }
+
+            // Function to flash the timer display indefinitely until reset
+            function flashTimer(timerElement, timerId) {
+                const timer = timers.find(t => t.id === timerId);
+                const inputs = timerElement.querySelectorAll('.timer-input-group input');
+                
+                if (timer.flashingInterval) {
+                    clearInterval(timer.flashingInterval);
+                }
+
+                timer.flashingInterval = setInterval(() => {
+                    inputs.forEach(input => input.classList.toggle('flash-red'));
+                    timerElement.classList.toggle('flash-red-border');
+                }, 250);
+            }
+
+            // Function to reset the timer state
+            function resetTimerState(timerCard, timerId) {
+                const timer = timers.find(t => t.id === timerId);
+                
+                if (timer.interval !== null) {
+                    clearInterval(timer.interval);
+                    timer.interval = null;
+                }
+
+                if (timer.alarmInterval !== null) {
+                    clearInterval(timer.alarmInterval);
+                    timer.alarmInterval = null;
+                }
+                
+                if (timer.flashingInterval !== null) {
+                    clearInterval(timer.flashingInterval);
+                    timer.flashingInterval = null;
+                    const inputs = timerCard.querySelectorAll('.timer-input-group input');
+                    inputs.forEach(input => input.classList.remove('flash-red'));
+                    timerCard.classList.remove('flash-red-border');
+                }
+                
+                timer.time = 0;
+                timer.isRunning = false;
+                timer.isAlarming = false;
+                timer.isCountdown = true; // Reset countdown state
+                updateDisplay(timerId);
+                setToggleButton(timerCard, false, false);
+            }
+
+            // A new function to convert a string to proper case
+            function toProperCase(str) {
+                return str.replace(/\w\S*/g, (txt) => {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            }
+
+            // Function to start or resume a timer
+            function startTimer(timerId) {
+                const timer = timers.find(t => t.id === timerId);
+                const timerElement = document.getElementById(`timer-${timerId}`);
+
+                // Clear any existing interval to prevent duplicates
+                if (timer.interval) {
+                    clearInterval(timer.interval);
+                }
+                
+                timer.isRunning = true;
+                setToggleButton(timerElement, true, false);
+
+                timer.interval = setInterval(() => {
+                    if (timer.isCountdown) {
+                        timer.time--;
+                        if (timer.time <= 0) {
+                            clearInterval(timer.interval);
+                            timer.interval = null;
+                            timer.isRunning = false;
+                            timer.time = 0;
+                            updateDisplay(timerId);
+                            startAlarmTriplets(timerId);
+                            setToggleButton(timerElement, false, true);
+                            flashTimer(timerElement, timerId);
+                            return;
+                        }
+                    } else {
+                        timer.time++;
+                    }
+                    updateDisplay(timerId);
+                }, 1000);
+            }
+
+            // Add visibilitychange event listener to handle backgrounding
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // Page is now hidden, save the last time
+                    lastVisibilityChangeTime = Date.now();
+                    timers.forEach(timer => {
+                        if (timer.isRunning) {
+                            clearInterval(timer.interval);
+                            timer.interval = null;
+                        }
+                    });
+                } else {
+                    // Page is now visible, check for elapsed time
+                    if (lastVisibilityChangeTime) {
+                        const elapsedTimeInSeconds = Math.floor((Date.now() - lastVisibilityChangeTime) / 1000);
+                        timers.forEach(timer => {
+                            if (timer.isRunning) {
+                                if (timer.isCountdown) {
+                                    timer.time -= elapsedTimeInSeconds;
+                                    if (timer.time <= 0) {
+                                        const timerElement = document.getElementById(`timer-${timer.id}`);
+                                        startAlarmTriplets(timer.id);
+                                        setToggleButton(timerElement, false, true);
+                                        flashTimer(timerElement, timer.id);
+                                        timer.isRunning = false;
+                                        timer.time = 0;
+                                    } else {
+                                        startTimer(timer.id);
+                                    }
+                                } else {
+                                    timer.time += elapsedTimeInSeconds;
+                                    startTimer(timer.id);
+                                }
+                                updateDisplay(timer.id);
+                            }
+                        });
+                        lastVisibilityChangeTime = null;
+                    }
+                }
+            });
+
+
+            // Event listener for the entire container to handle all button clicks
+            timersContainer.addEventListener('click', (event) => {
+                const button = event.target.closest('button');
+                const timerCard = event.target.closest('.timer-card');
+                if (!button || !timerCard) return;
+
+                const timerId = parseInt(timerCard.id.split('-')[1], 10);
+                const timer = timers.find(t => t.id === timerId);
+
+                // Start audio context on the first user interaction
+                if (!audioStarted) {
+                    Tone.start();
+                    audioStarted = true;
+                }
+                
+                if (button.classList.contains('timer-btn-toggle')) {
+                    if (timer.isAlarming) {
+                         resetTimerState(timerCard, timerId);
+                    } else if (!timer.isRunning) {
+                        const hours = parseInt(timerCard.querySelector('.timer-input-hour').value, 10) || 0;
+                        const minutes = parseInt(timerCard.querySelector('.timer-input-minute').value, 10) || 0;
+                        const seconds = parseInt(timerCard.querySelector('.timer-input-second').value, 10) || 0;
+                        
+                        timer.time = (hours * 3600) + (minutes * 60) + seconds;
+
+                        // Check if it's a countdown or a stopwatch
+                        timer.isCountdown = timer.time > 0;
+                        
+                        startTimer(timerId);
+                    } else {
+                        clearInterval(timer.interval);
+                        timer.interval = null;
+                        timer.isRunning = false;
+                        setToggleButton(timerCard, false, false);
+                    }
+                } else if (button.classList.contains('timer-btn-add-hour')) {
+                    if (!timer.isRunning && !timer.isAlarming) {
+                         timer.time += 3600;
+                         updateDisplay(timerId);
+                    }
+                } else if (button.classList.contains('timer-btn-add-minute')) {
+                    if (!timer.isRunning && !timer.isAlarming) {
+                        timer.time += 60;
+                        updateDisplay(timerId);
+                    }
+                } else if (button.classList.contains('timer-btn-add-second')) {
+                    if (!timer.isRunning && !timer.isAlarming) {
+                        timer.time += 1;
+                        updateDisplay(timerId);
+                    }
+                } else if (button.classList.contains('timer-btn-reset')) {
+                    resetTimerState(timerCard, timerId);
+                }
+            });
+
+            // Event listener for name changes and new time inputs
+            timersContainer.addEventListener('input', (event) => {
+                const input = event.target;
+                const timerCard = input.closest('.timer-card');
+                if (!timerCard) return;
+
+                const timerId = parseInt(timerCard.id.split('-')[1], 10);
+                const timer = timers.find(t => t.id === timerId);
+
+                if (input.classList.contains('timer-name')) {
+                    input.value = toProperCase(input.value);
+                    timer.name = input.value;
+                } else if (input.closest('.timer-input-group') && !timer.isRunning && !timer.isAlarming) {
+                    const hours = parseInt(timerCard.querySelector('.timer-input-hour').value, 10) || 0;
+                    const minutes = parseInt(timerCard.querySelector('.timer-input-minute').value, 10) || 0;
+                    const seconds = parseInt(timerCard.querySelector('.timer-input-second').value, 10) || 0;
+
+                    // Clamp values for minutes and seconds
+                    timerCard.querySelector('.timer-input-minute').value = Math.min(minutes, 59);
+                    timerCard.querySelector('.timer-input-second').value = Math.min(seconds, 59);
+
+                    timer.time = (hours * 3600) + (minutes * 60) + seconds;
+                    updateDisplay(timerId);
+                }
+            });
+
+            // New event listener to select text on focus
+            timersContainer.addEventListener('focusin', (event) => {
+                const input = event.target;
+                if (input.classList.contains('timer-name')) {
+                    input.select();
+                }
+            });
+            
+            // Initial display update for all timers
+            timers.forEach(timer => updateDisplay(timer.id));
+        });
+    </script>
+</body>
+</html>
+
+
