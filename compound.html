@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern, interactive compound interest calculator to visualize investment growth with a real-time chart and detailed breakdown table.">
+    <meta name="keywords" content="compound interest, calculator, finance, investment, savings, growth, financial planning, money, chart">
+    <meta name="author" content="Gemini">
+    <title>Compound Interest Calculator</title>
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c; /* Dark background similar to the reference site */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container-shadow {
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            min-height: 300px; /* Ensure a minimum height for smaller screens */
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 0.75rem;
+        }
+        /* Hide spin buttons for number inputs */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(30, 41, 59, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            transform: translate(-50%, -100%);
+        }
+        /* Reduce font size for table cells and header on small screens */
+        @media (max-width: 640px) {
+            .table-cell-sm {
+                padding: 0.5rem 0.5rem; /* px-2 py-2 */
+                font-size: 0.75rem; /* text-xs */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex flex-col min-h-screen text-gray-200">
+
+    <!-- Main container for a wider desktop layout -->
+    <div class="bg-gray-800 p-8 md:p-12 rounded-2xl container-shadow w-full max-w-7xl mx-auto my-auto">
+        <h1 class="text-3xl font-semibold text-center text-white mb-6">Compound Interest Calculator</h1>
+
+        <!-- Content stacked vertically -->
+        <div class="flex flex-col gap-8">
+            <!-- Inputs and Button stacked vertically -->
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Principal Input with Currency Symbol -->
+                    <div class="relative">
+                        <label for="principal" class="block text-sm font-medium text-gray-400 mb-1">Initial Balance</label>
+                        <div class="relative flex items-center">
+                            <span id="principal-currency-symbol" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
+                            <input type="text" id="principal" inputmode="numeric" onfocus="this.select()" oninput="formatLive(this)" onblur="formatInput(this)" class="w-full pl-8 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                        </div>
+                    </div>
+
+                    <!-- Combined Contribution Input and Frequency Toggle -->
+                    <div>
+                        <label for="contribution" class="block text-sm font-medium text-gray-400 mb-1">Contribution</label>
+                        <div class="flex items-center space-x-2">
+                            <!-- Contribution Input with Currency Symbol -->
+                            <div class="relative flex-1">
+                                <span id="contribution-currency-symbol" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
+                                <input type="text" id="contribution" inputmode="numeric" onfocus="this.select()" oninput="formatLive(this)" onblur="formatInput(this)" class="w-full pl-8 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                            </div>
+                            <!-- Contribution Frequency Toggles -->
+                            <div class="flex items-center space-x-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="contributionFrequency" value="monthly" checked class="form-radio text-blue-600 h-4 w-4">
+                                    <span class="ml-1 text-sm text-gray-300">Monthly</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="contributionFrequency" value="annually" class="form-radio text-blue-600 h-4 w-4">
+                                    <span class="ml-1 text-sm text-gray-300">Annually</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interest Rate Input -->
+                    <div>
+                        <label for="rate" class="block text-sm font-medium text-gray-400 mb-1">Annual Interest Rate (%)</label>
+                        <input type="number" id="rate" inputmode="numeric" value="5" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                    </div>
+                    
+                    <!-- Years Input -->
+                    <div>
+                        <label for="years" class="block text-sm font-medium text-gray-400 mb-1">Number of Years</label>
+                        <input type="number" id="years" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                    </div>
+
+                    
+                    <!-- Currency Dropdown -->
+                    <div>
+                        <label for="currency" class="block text-sm font-medium text-gray-400 mb-1">Currency</label>
+                        <select id="currency" onchange="updateCurrencySymbols()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200">
+                            <option value="£" selected>GBP (£)</option>
+                            <option value="$">USD ($)</option>
+                            <option value="€">EUR (€)</option>
+                            <option value="¥">JPY (¥)</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Button to trigger calculation -->
+                <button onclick="calculateCompoundInterest()" class="w-full px-6 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 active:bg-blue-800">
+                    Calculate Interest
+                </button>
+            </div>
+
+            <!-- Results display area -->
+            <div id="result" class="text-center p-6 bg-gray-700 rounded-xl shadow-inner">
+                <p class="text-lg font-semibold text-gray-400">Final Balance</p>
+                <p id="finalAmountValue" class="text-4xl font-extrabold text-blue-400 mt-2">£0.00</p>
+                <p class="text-lg font-semibold text-gray-400 mt-4">Total Contributions</p>
+                <p id="contributionsValue" class="text-2xl font-extrabold text-blue-400 mt-2">£0.00</p>
+            </div>
+
+            <!-- Growth chart and tooltip container -->
+            <div class="p-4 bg-gray-800 rounded-xl container-shadow relative">
+                <h2 class="text-lg font-semibold text-center text-gray-300 mb-2">Investment Growth</h2>
+                <canvas id="growthChart" onmousemove="handleMouseMove(event)" onmouseout="hideTooltip()"></canvas>
+                <div id="tooltip" class="tooltip"></div>
+            </div>
+
+            <!-- Results table -->
+            <div id="results-table-container" class="p-4 bg-gray-800 rounded-xl container-shadow">
+                <h2 class="text-lg font-semibold text-center text-gray-300 mb-4">Yearly Breakdown</h2>
+                <div class="overflow-x-auto rounded-xl">
+                    <table class="w-full text-sm text-left text-gray-400">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-700">
+                            <tr>
+                                <th scope="col" class="py-2 px-2 table-cell-sm">Year</th>
+                                <th scope="col" class="py-2 px-2 text-right table-cell-sm">Opening Balance</th>
+                                <th scope="col" class="py-2 px-2 text-right table-cell-sm">Contributions</th>
+                                <th scope="col" class="py-2 px-2 text-right table-cell-sm">Interest Earned</th>
+                                <th scope="col" class="py-2 px-2 text-right table-cell-sm">Closing Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Table rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error/info message box -->
+        <div id="message" class="hidden text-sm text-center py-2 px-4 rounded-lg text-red-400 bg-red-900 border border-red-700 mt-6"></div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="text-center w-full text-gray-500 text-xs mt-8 pb-4">
+        Created by Bradley Pollard 2025
+    </div>
+
+    <script>
+        let growthData = [];
+        let contributionsData = [];
+        let currency = '£';
+        const tooltip = document.getElementById('tooltip');
+        let chartDimensions = {};
+        
+        /**
+         * Helper function to clean a number or string by removing commas and currency symbols.
+         * @param {string|number} input The value to clean.
+         * @returns {string} The cleaned string containing only digits and a decimal point.
+         */
+        function cleanNumberString(input) {
+            const str = String(input);
+            return str.replace(/[^0-9.]/g, '');
+        }
+
+        /**
+         * Formats a number to a currency string with commas and specified decimals.
+         * @param {number|string} num The number to format.
+         * @param {number} decimals The number of decimal places.
+         * @returns {string} The formatted currency string.
+         */
+        function formatCurrency(num, decimals) {
+            const cleanedNum = parseFloat(cleanNumberString(num));
+            if (isNaN(cleanedNum)) {
+                return '0.00';
+            }
+            return cleanedNum.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Formats the input value instantly as the user types
+        function formatLive(element) {
+            const value = cleanNumberString(element.value);
+            // This function intentionally doesn't add decimals to allow for user input.
+            const parts = value.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            element.value = parts.join('.');
+        }
+
+        // Formats the input value when the user leaves the field
+        function formatInput(element) {
+            const value = cleanNumberString(element.value);
+            if (value !== '') {
+                const number = parseFloat(value);
+                if (!isNaN(number)) {
+                    element.value = formatCurrency(number, 2);
+                }
+            }
+        }
+
+        /**
+         * Animates a value counting up to a final target.
+         * @param {HTMLElement} element The element to update.
+         * @param {number} finalValue The value to count up to.
+         * @param {number} duration The duration of the animation in milliseconds.
+         */
+        function animateValue(element, finalValue, duration) {
+            let startTimestamp = null;
+            const startValue = parseFloat(cleanNumberString(element.textContent)) || 0;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = progress * (finalValue - startValue) + startValue;
+                element.textContent = currency + formatCurrency(currentValue, 2);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    // Ensure the final value is exact to avoid floating point issues
+                    element.textContent = currency + formatCurrency(finalValue, 2);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function calculateCompoundInterest() {
+            // Get the input elements
+            const principalInput = document.getElementById('principal');
+            const contributionInput = document.getElementById('contribution');
+            const rateInput = document.getElementById('rate');
+            const yearsInput = document.getElementById('years');
+            const currencyInput = document.getElementById('currency');
+            const finalAmountDisplay = document.getElementById('finalAmountValue');
+            const contributionsValueDisplay = document.getElementById('contributionsValue');
+            const messageBox = document.getElementById('message');
+            
+            // Set default values for empty inputs, cleaning formatted strings
+            const P = principalInput.value === '' ? 0 : parseFloat(cleanNumberString(principalInput.value));
+            const C = contributionInput.value === '' ? 0 : parseFloat(cleanNumberString(contributionInput.value));
+            const t = yearsInput.value === '' ? 0 : parseFloat(yearsInput.value);
+            const r = parseFloat(rateInput.value) / 100; // Convert percentage to decimal
+            currency = currencyInput.value;
+
+            // Determine contribution frequency
+            const isMonthly = document.querySelector('input[name="contributionFrequency"]:checked').value === 'monthly';
+            
+            // Validate inputs
+            if (isNaN(P) || isNaN(C) || isNaN(r) || isNaN(t) || P < 0 || C < 0 || r < 0 || t < 0) {
+                messageBox.textContent = 'Please enter valid non-negative numbers for all fields.';
+                messageBox.style.display = 'block';
+                return;
+            } else {
+                messageBox.style.display = 'none';
+            }
+
+            // Calculation loop for monthly compounding
+            let totalContributions = P;
+            let openingBalance = P;
+            
+            growthData = [{ year: 0, amount: P }];
+            contributionsData = [{ year: 0, amount: P }];
+            const tableData = [];
+
+            for (let i = 1; i <= t; i++) {
+                let contributionsThisYear = 0;
+                let monthlyBalance = openingBalance;
+
+                // Add annual contribution at the beginning of the year if selected
+                if (!isMonthly) {
+                    monthlyBalance += C;
+                    contributionsThisYear = C;
+                }
+                
+                // Monthly loop for compounding
+                for (let j = 0; j < 12; j++) {
+                    if (isMonthly) {
+                        monthlyBalance += C;
+                        contributionsThisYear += C;
+                    }
+                    monthlyBalance *= (1 + r / 12);
+                }
+                
+                const closingBalanceThisYear = monthlyBalance;
+                const interestEarnedThisYear = closingBalanceThisYear - openingBalance - contributionsThisYear;
+
+                tableData.push({
+                    year: i,
+                    openingBalance: openingBalance,
+                    contributions: contributionsThisYear,
+                    interestEarned: interestEarnedThisYear,
+                    closingBalance: closingBalanceThisYear,
+                });
+                
+                openingBalance = closingBalanceThisYear;
+                totalContributions += contributionsThisYear;
+
+                growthData.push({ year: i, amount: openingBalance });
+                contributionsData.push({ year: i, amount: totalContributions });
+            }
+
+            const animationDuration = 1500;
+            // Animate the final values
+            animateValue(finalAmountDisplay, openingBalance, animationDuration);
+            animateValue(contributionsValueDisplay, totalContributions, animationDuration);
+
+            // Animate the chart drawing
+            animateChart(animationDuration);
+
+            // Render the table
+            renderTable(tableData);
+        }
+
+        /**
+         * Animates the chart drawing.
+         * @param {number} duration The animation duration in milliseconds.
+         */
+        function animateChart(duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                drawChart(null, progress);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function renderTable(data) {
+            const tableBody = document.getElementById('resultsTableBody');
+            tableBody.innerHTML = ''; // Clear existing content
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.classList.add('bg-gray-800', 'border-b', 'border-gray-700', 'hover:bg-gray-700', 'transition-colors');
+                
+                const yearCell = document.createElement('td');
+                yearCell.classList.add('py-2', 'px-2', 'font-medium', 'text-gray-200', 'table-cell-sm');
+                yearCell.textContent = item.year;
+
+                const openingBalanceCell = document.createElement('td');
+                openingBalanceCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
+                openingBalanceCell.textContent = currency + formatCurrency(item.openingBalance, 2);
+
+                const contributionsCell = document.createElement('td');
+                contributionsCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
+                contributionsCell.textContent = currency + formatCurrency(item.contributions, 2);
+                
+                const interestEarnedCell = document.createElement('td');
+                interestEarnedCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
+                interestEarnedCell.textContent = currency + formatCurrency(item.interestEarned, 2);
+
+                const closingBalanceCell = document.createElement('td');
+                closingBalanceCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
+                closingBalanceCell.textContent = currency + formatCurrency(item.closingBalance, 2);
+
+                row.appendChild(yearCell);
+                row.appendChild(openingBalanceCell);
+                row.appendChild(contributionsCell);
+                row.appendChild(interestEarnedCell);
+                row.appendChild(closingBalanceCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function resizeCanvas() {
+            const canvas = document.getElementById('growthChart');
+            const dpi = window.devicePixelRatio;
+            // Set canvas size for high-res display
+            canvas.width = canvas.offsetWidth * dpi;
+            canvas.height = canvas.offsetHeight * dpi;
+            // Scale context to handle DPI, so everything draws correctly
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpi, dpi);
+        }
+
+        /**
+         * Draws the chart.
+         * @param {number|null} hoverYear The year being hovered over.
+         * @param {number} [progress=1] The animation progress (0 to 1).
+         */
+        function drawChart(hoverYear, progress = 1) {
+            const canvas = document.getElementById('growthChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear the canvas, but don't resize it here
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Find max values for scaling
+            const maxAmount = Math.max(...growthData.map(d => d.amount));
+            const maxYear = growthData.length > 0 ? growthData[growthData.length - 1].year : 0;
+            
+            // Handle no growth scenario
+            if (maxAmount <= 0 || maxYear <= 0) {
+                ctx.fillStyle = '#cbd5e0';
+                ctx.font = '14px Poppins';
+                ctx.textAlign = 'center';
+                ctx.fillText('No growth to display', canvas.offsetWidth / 2, canvas.offsetHeight / 2);
+                return;
+            }
+
+            // Chart dimensions
+            const paddingTop = 60;
+            const paddingRight = 30;
+            const paddingBottom = 40;
+            const yAxisLabelFont = '12px Poppins';
+            ctx.font = yAxisLabelFont;
+            
+            // Calculate dynamic left padding based on the longest Y-axis label
+            const longestLabelText = currency + formatCurrency(maxAmount, 0);
+            const longestLabelWidth = ctx.measureText(longestLabelText).width;
+            const paddingLeft = Math.max(60, longestLabelWidth + 10); // Minimum padding of 60, plus buffer
+            
+            const chartWidth = canvas.offsetWidth - paddingLeft - paddingRight;
+            const chartHeight = canvas.offsetHeight - paddingTop - paddingBottom;
+            
+            // Store dimensions for mouse tracking
+            chartDimensions = {
+                paddingTop, paddingRight, paddingBottom, paddingLeft,
+                chartWidth, chartHeight,
+                canvasWidth: canvas.offsetWidth,
+                canvasHeight: canvas.offsetHeight
+            };
+
+            // Draw axes
+            ctx.strokeStyle = '#4a5568';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(paddingLeft, paddingTop + chartHeight);
+            ctx.lineTo(paddingLeft + chartWidth, paddingTop + chartHeight); // X-axis
+            ctx.lineTo(paddingLeft + chartWidth, paddingTop); // Y-axis
+            ctx.stroke();
+
+            // Draw labels and tick marks
+            ctx.fillStyle = '#a0aec0';
+            ctx.font = yAxisLabelFont;
+            ctx.textAlign = 'right';
+            
+            // Y-axis labels
+            const numYLabels = 5;
+            for (let i = 0; i <= numYLabels; i++) {
+                const y = paddingTop + chartHeight * (1 - i / numYLabels);
+                const value = (maxAmount / numYLabels) * i;
+                ctx.fillText(currency + formatCurrency(value, 0), paddingLeft - 5, y + 4);
+                ctx.beginPath();
+                ctx.moveTo(paddingLeft - 5, y);
+                ctx.lineTo(paddingLeft, y);
+                ctx.stroke();
+            }
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            const numXLabels = Math.min(maxYear, 10);
+            for (let i = 0; i <= numXLabels; i++) {
+                const year = Math.round(maxYear / numXLabels * i);
+                const x = paddingLeft + (chartWidth / numXLabels) * i;
+                ctx.fillText(year, x, paddingTop + chartHeight + 20);
+            }
+            
+            // Draw Legend
+            ctx.fillStyle = '#a0aec0';
+            ctx.font = '14px Poppins';
+            ctx.textAlign = 'left';
+            const legendPaddingTop = 20;
+            const legendItemSpacing = 160;
+            
+            // Total Investment legend item
+            ctx.fillStyle = '#63b3ed';
+            ctx.fillRect(paddingLeft, legendPaddingTop, 15, 5);
+            ctx.fillStyle = '#a0aec0';
+            ctx.fillText('Total Investment', paddingLeft + 25, legendPaddingTop + 4);
+
+            // Total Contributions legend item
+            ctx.fillStyle = '#a0aec0';
+            ctx.fillRect(paddingLeft + legendItemSpacing, legendPaddingTop, 15, 5);
+            ctx.fillStyle = '#a0aec0';
+            ctx.fillText('Total Contributions', paddingLeft + legendItemSpacing + 25, legendPaddingTop + 4);
+
+            // Draw the line graphs
+            function drawLine(lineData, color) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                const xStep = chartWidth / maxYear;
+                const yScale = chartHeight / maxAmount;
+                
+                // Determine the number of points to draw based on progress
+                const numPointsToDraw = Math.floor(lineData.length * progress);
+                if (numPointsToDraw < 2) return; // Need at least two points to draw a line segment
+                
+                ctx.moveTo(paddingLeft, paddingTop + chartHeight - (lineData[0].amount * yScale));
+                
+                for (let i = 1; i < numPointsToDraw; i++) {
+                    const point = lineData[i];
+                    const x = paddingLeft + point.year * xStep;
+                    const y = paddingTop + chartHeight - (point.amount * yScale);
+                    ctx.lineTo(x, y);
+                }
+
+                // Draw the last, partially-drawn segment if needed
+                if (progress < 1) {
+                    const lastPointIndex = numPointsToDraw - 1;
+                    const lastPoint = lineData[lastPointIndex];
+                    const nextPoint = lineData[lastPointIndex + 1];
+                    const fractionalProgress = (lineData.length * progress) - numPointsToDraw;
+                    
+                    const startX = paddingLeft + lastPoint.year * xStep;
+                    const startY = paddingTop + chartHeight - (lastPoint.amount * yScale);
+                    
+                    const endX = paddingLeft + nextPoint.year * xStep;
+                    const endY = paddingTop + chartHeight - (nextPoint.amount * yScale);
+
+                    const currentX = startX + (endX - startX) * fractionalProgress;
+                    const currentY = startY + (endY - startY) * fractionalProgress;
+                    
+                    ctx.lineTo(currentX, currentY);
+                }
+
+                ctx.stroke();
+            }
+            drawLine(growthData, '#63b3ed'); // Total Investment line (blue)
+            drawLine(contributionsData, '#a0aec0'); // Total Contributions line (light gray)
+
+            // Draw a dot on the hovered data point ONLY if animation is complete
+            if (progress >= 1 && hoverYear !== null) {
+                const hoveredPoint = growthData.find(d => d.year === hoverYear);
+                const hoveredContribution = contributionsData.find(d => d.year === hoverYear);
+                if (hoveredPoint) {
+                    const xStep = chartWidth / maxYear;
+                    const yScale = chartHeight / maxAmount;
+                    const x = paddingLeft + hoveredPoint.year * xStep;
+                    const y1 = paddingTop + chartHeight - (hoveredPoint.amount * yScale);
+                    const y2 = paddingTop + chartHeight - (hoveredContribution.amount * yScale);
+                    
+                    // Highlight dot for investment
+                    ctx.fillStyle = '#63b3ed';
+                    ctx.beginPath();
+                    ctx.arc(x, y1, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    // Highlight dot for contributions
+                    ctx.fillStyle = '#a0aec0';
+                    ctx.beginPath();
+                    ctx.arc(x, y2, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function updateCurrencySymbols() {
+            const currencySymbol = document.getElementById('currency').value;
+            const principalInput = document.getElementById('principal');
+            const contributionInput = document.getElementById('contribution');
+
+            document.getElementById('principal-currency-symbol').textContent = currencySymbol;
+            document.getElementById('contribution-currency-symbol').textContent = currencySymbol;
+            
+            // Re-format the values to show the new currency symbol
+            formatInput(principalInput);
+            formatInput(contributionInput);
+        }
+
+        function getMousePos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        function handleMouseMove(event) {
+            if (growthData.length === 0) return;
+            const canvas = document.getElementById('growthChart');
+            const mousePos = getMousePos(canvas, event);
+            const x = mousePos.x;
+
+            const paddingLeft = chartDimensions.paddingLeft;
+            const paddingTop = chartDimensions.paddingTop;
+            const chartWidth = chartDimensions.chartWidth;
+            const chartHeight = chartDimensions.chartHeight;
+            const maxAmount = Math.max(...growthData.map(d => d.amount));
+            const maxYear = growthData.length > 0 ? growthData[growthData.length - 1].year : 0;
+            
+            // Calculate the year value based on the mouse's horizontal position
+            const xInChart = x - paddingLeft;
+            if (xInChart >= 0 && xInChart <= chartWidth) {
+                const yearFraction = xInChart / chartWidth * maxYear;
+                
+                // Find the two data points to interpolate between
+                const floorYear = Math.floor(yearFraction);
+                const ceilYear = Math.ceil(yearFraction);
+
+                const lowerPoint = growthData.find(d => d.year === floorYear);
+                const upperPoint = growthData.find(d => d.year === ceilYear);
+                
+                if (lowerPoint && upperPoint) {
+                    // Linear interpolation to get precise values
+                    const t = (ceilYear - floorYear) > 0 ? (yearFraction - floorYear) / (ceilYear - floorYear) : 0;
+                    const interpolatedInvestment = lowerPoint.amount + t * (upperPoint.amount - lowerPoint.amount);
+                    
+                    // Need to find contributions at floor and ceil year to interpolate.
+                    const lowerContrib = contributionsData.find(d => d.year === floorYear);
+                    const upperContrib = contributionsData.find(d => d.year === ceilYear);
+                    const interpolatedContributions = lowerContrib.amount + t * (upperContrib.amount - lowerContrib.amount);
+
+                    // Calculate the canvas coordinates for the interpolated point
+                    const xPos = paddingLeft + xInChart;
+                    const yScale = chartHeight / maxAmount;
+                    const yPos = paddingTop + chartHeight - (interpolatedInvestment * yScale);
+                    
+                    // Draw highlight dot at interpolated position
+                    drawChart(null);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#63b3ed';
+                    ctx.beginPath();
+                    ctx.arc(xPos, yPos, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    // Show tooltip at the interpolated position
+                    showTooltip({x: xPos, y: yPos}, {year: yearFraction.toFixed(1), amount: interpolatedInvestment}, {year: yearFraction.toFixed(1), amount: interpolatedContributions});
+                } else {
+                    hideTooltip();
+                    drawChart(null);
+                }
+            } else {
+                hideTooltip();
+                drawChart(null);
+            }
+        }
+
+        function showTooltip(pos, investment, contributions) {
+            tooltip.style.left = `${pos.x}px`;
+            tooltip.style.top = `${pos.y}px`;
+            tooltip.style.opacity = '1';
+            tooltip.innerHTML = `
+                <p class="font-bold">Year ${investment.year}</p>
+                <p>Investment: ${currency}${formatCurrency(investment.amount, 2)}</p>
+                <p>Contributions: ${currency}${formatCurrency(contributions.amount, 2)}</p>
+            `;
+        }
+        
+        function hideTooltip() {
+            if (growthData.length === 0) return;
+            tooltip.style.opacity = '0';
+            drawChart(null); // Redraw to remove highlight
+        }
+
+        // Initial setup on page load
+        function initialize() {
+            updateCurrencySymbols(); // Set initial currency symbols
+            resizeCanvas(); // Set the canvas size initially
+            // Initial calculation is not run on load to avoid error messages with empty fields.
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                calculateCompoundInterest();
+            });
+        }
+        window.onload = initialize;
+
+    </script>
+</body>
+</html>
+
