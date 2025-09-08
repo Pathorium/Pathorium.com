@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A modern, interactive compound interest calculator to visualize investment growth with a real-time chart and detailed breakdown table.">
-    <meta name="keywords" content="compound interest, calculator, finance, investment, savings, growth, financial planning, money, chart">
+    <meta name="description" content="A modern, interactive compound interest calculator to visualize investment growth with a real-time chart and detailed breakdown table, now with drawdown and withdrawal logic.">
+    <meta name="keywords" content="compound interest, calculator, finance, investment, savings, growth, financial planning, money, chart, drawdown, withdrawal, retirement">
     <meta name="author" content="Gemini">
     <title>Compound Interest Calculator</title>
     <!-- Load Tailwind CSS from CDN -->
@@ -129,6 +129,53 @@
                         <input type="number" id="ageToStop" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
                     </div>
                 </div>
+
+                <!-- Drawdown Options Container -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Age to Start Drawdown Input -->
+                    <div>
+                        <label for="ageToStartDrawdown" class="block text-sm font-medium text-gray-400 mb-1">Age to Start Drawdown (Optional)</label>
+                        <input type="number" id="ageToStartDrawdown" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                    </div>
+
+                    <!-- Drawdown Rate Option -->
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="drawdownType" value="rate" checked class="form-radio text-blue-600 h-4 w-4" onchange="toggleDrawdownFields()">
+                                <span class="ml-1 text-sm text-gray-300">Drawdown Rate (%)</span>
+                            </label>
+                        </div>
+                        <input type="number" id="drawdownRate" inputmode="numeric" onfocus="this.select()" class="w-full mt-2 px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                    </div>
+
+                    <!-- Fixed Withdrawal Amount Option -->
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="drawdownType" value="fixed" class="form-radio text-blue-600 h-4 w-4" onchange="toggleDrawdownFields()">
+                                <span class="ml-1 text-sm text-gray-300">Fixed Withdrawal (£)</span>
+                            </label>
+                        </div>
+                        <div class="flex flex-col space-y-2 mt-2">
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
+                                <input type="text" id="fixedWithdrawalAmount" inputmode="numeric" onfocus="this.select()" oninput="formatLive(this)" onblur="formatInput(this)" disabled class="w-full pl-8 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500 disabled:opacity-50">
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="withdrawalFrequency" value="monthly" checked class="form-radio text-blue-600 h-4 w-4">
+                                    <span class="ml-1 text-sm text-gray-300">Monthly</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="withdrawalFrequency" value="annually" class="form-radio text-blue-600 h-4 w-4">
+                                    <span class="ml-1 text-sm text-gray-300">Annually</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Button to trigger calculation -->
                 <button onclick="calculateCompoundInterest()" class="w-full px-6 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 active:bg-blue-800">
                     Calculate Interest
@@ -160,6 +207,7 @@
                                 <th scope="col" class="py-2 px-2 table-cell-sm">Age</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Opening Balance</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Contributions</th>
+                                <th scope="col" class="py-2 px-2 text-right table-cell-sm">Withdrawals</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Interest Earned</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Closing Balance</th>
                             </tr>
@@ -171,7 +219,11 @@
                 </div>
             </div>
         </div>
-
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>For illustrative purposes only</p>
+        </footer>
+        
         <!-- Error/info message box -->
         <div id="message" class="hidden text-sm text-center py-2 px-4 rounded-lg text-red-400 bg-red-900 border border-red-700 mt-6"></div>
     </div>
@@ -217,7 +269,7 @@
             const value = cleanNumberString(element.value);
             // This function intentionally doesn't add decimals to allow for user input.
             const parts = value.split('.');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            parts[0] = parts[0].replace(/\B(?=(\d\d\d)+(?!\d))/g, ",");
             element.value = parts.join('.');
         }
 
@@ -264,6 +316,9 @@
             const startingAgeInput = document.getElementById('startingAge');
             const ageToCalculateToInput = document.getElementById('ageToCalculateTo');
             const ageToStopInput = document.getElementById('ageToStop');
+            const ageToStartDrawdownInput = document.getElementById('ageToStartDrawdown');
+            const drawdownRateInput = document.getElementById('drawdownRate');
+            const fixedWithdrawalAmountInput = document.getElementById('fixedWithdrawalAmount');
             const finalAmountDisplay = document.getElementById('finalAmountValue');
             const contributionsValueDisplay = document.getElementById('contributionsValue');
             const messageBox = document.getElementById('message');
@@ -284,6 +339,16 @@
                 ageToStop = parseFloat(ageToStopInput.value);
             }
             
+            // Handle optional drawdown fields
+            const ageToStartDrawdown = ageToStartDrawdownInput.value === '' ? null : parseFloat(ageToStartDrawdownInput.value);
+            const drawdownRate = drawdownRateInput.value === '' ? 0 : parseFloat(drawdownRateInput.value);
+            const fixedWithdrawalAmount = fixedWithdrawalAmountInput.value === '' ? 0 : parseFloat(cleanNumberString(fixedWithdrawalAmountInput.value));
+
+            // Check drawdown type and frequency
+            const drawdownType = document.querySelector('input[name="drawdownType"]:checked').value;
+            const withdrawalFrequency = document.querySelector('input[name="withdrawalFrequency"]:checked').value;
+
+
             // New logic for calculating years based on age inputs
             if (startingAge === null || ageToCalculateTo === null) {
                 messageBox.textContent = 'Please enter a value for both starting age and age to calculate to.';
@@ -297,14 +362,20 @@
                 return;
             }
 
+            if (ageToStartDrawdown && (ageToStartDrawdown > ageToCalculateTo || ageToStartDrawdown < startingAge)) {
+                 messageBox.textContent = 'Please ensure Age to Start Drawdown is between Starting Age and Age to Calculate To.';
+                messageBox.style.display = 'block';
+                return;
+            }
+
             const totalYears = ageToCalculateTo - startingAge;
             const contributionYears = ageToStop - startingAge;
 
             // Determine contribution frequency
-            const isMonthly = document.querySelector('input[name="contributionFrequency"]:checked').value === 'monthly';
+            const isMonthlyContribution = document.querySelector('input[name="contributionFrequency"]:checked').value === 'monthly';
             
             // Validate inputs
-            if (isNaN(P) || isNaN(C) || isNaN(r) || isNaN(totalYears) || isNaN(contributionYears) || P < 0 || C < 0 || r < 0) {
+            if (isNaN(P) || isNaN(C) || isNaN(r) || isNaN(totalYears) || isNaN(contributionYears) || P < 0 || C < 0 || r < 0 || drawdownRate < 0 || fixedWithdrawalAmount < 0) {
                 messageBox.textContent = 'Please enter valid non-negative numbers for all fields.';
                 messageBox.style.display = 'block';
                 return;
@@ -321,13 +392,15 @@
             const tableData = [];
 
             for (let i = 1; i <= totalYears; i++) {
+                const currentAge = startingAge + i;
                 let contributionsThisYear = 0;
+                let withdrawalsThisYear = 0;
                 let monthlyBalance = openingBalance;
                 
                 // Only add contributions if the current year is within the contribution period
-                if (i <= contributionYears) {
+                if (currentAge <= ageToStop) {
                     // Add annual contribution at the beginning of the year if selected
-                    if (!isMonthly) {
+                    if (!isMonthlyContribution) {
                         monthlyBalance += C;
                         contributionsThisYear = C;
                     }
@@ -336,20 +409,48 @@
                 // Monthly loop for compounding
                 for (let j = 0; j < 12; j++) {
                     // Only add monthly contributions if the current year is within the contribution period
-                    if (i <= contributionYears && isMonthly) {
+                    if (currentAge <= ageToStop && isMonthlyContribution) {
                         monthlyBalance += C;
                         contributionsThisYear += C;
                     }
                     monthlyBalance *= (1 + r / 12);
+
+                    // Apply monthly fixed withdrawal if applicable and selected
+                    if (ageToStartDrawdown && currentAge >= ageToStartDrawdown && drawdownType === 'fixed' && withdrawalFrequency === 'monthly') {
+                        let monthlyWithdrawal = fixedWithdrawalAmount;
+                        if (monthlyBalance < monthlyWithdrawal) {
+                            monthlyWithdrawal = monthlyBalance;
+                        }
+                        monthlyBalance -= monthlyWithdrawal;
+                        withdrawalsThisYear += monthlyWithdrawal;
+                    }
                 }
                 
-                const closingBalanceThisYear = monthlyBalance;
-                const interestEarnedThisYear = closingBalanceThisYear - openingBalance - contributionsThisYear;
+                let closingBalanceThisYear = monthlyBalance;
+                
+                // Apply drawdown logic if applicable
+                if (ageToStartDrawdown && currentAge >= ageToStartDrawdown) {
+                    if (drawdownType === 'rate') {
+                        withdrawalsThisYear = closingBalanceThisYear * (drawdownRate / 100);
+                        closingBalanceThisYear -= withdrawalsThisYear;
+                    } else if (drawdownType === 'fixed' && withdrawalFrequency === 'annually') {
+                         withdrawalsThisYear = fixedWithdrawalAmount;
+                         if (closingBalanceThisYear < withdrawalsThisYear) {
+                            withdrawalsThisYear = closingBalanceThisYear;
+                            closingBalanceThisYear = 0;
+                        } else {
+                            closingBalanceThisYear -= withdrawalsThisYear;
+                        }
+                    }
+                }
+                
+                const interestEarnedThisYear = closingBalanceThisYear - (openingBalance + contributionsThisYear - withdrawalsThisYear);
 
                 tableData.push({
                     year: i,
                     openingBalance: openingBalance,
                     contributions: contributionsThisYear,
+                    withdrawals: withdrawalsThisYear,
                     interestEarned: interestEarnedThisYear,
                     closingBalance: closingBalanceThisYear,
                 });
@@ -357,7 +458,7 @@
                 openingBalance = closingBalanceThisYear;
 
                 // Only add contributions to the total if they were made this year
-                if (i <= contributionYears) {
+                if (currentAge <= ageToStop) {
                     totalContributions += contributionsThisYear;
                 }
                 
@@ -375,6 +476,41 @@
 
             // Render the table
             renderTable(tableData, startingAge);
+        }
+
+        /**
+         * Toggles the disabled state of the drawdown input fields based on the radio button selection.
+         */
+        function toggleDrawdownFields() {
+            const drawdownRateInput = document.getElementById('drawdownRate');
+            const fixedWithdrawalAmountInput = document.getElementById('fixedWithdrawalAmount');
+            const withdrawalFrequencyRadios = document.querySelectorAll('input[name="withdrawalFrequency"]');
+            
+            const drawdownType = document.querySelector('input[name="drawdownType"]:checked').value;
+
+            if (drawdownType === 'rate') {
+                drawdownRateInput.disabled = false;
+                drawdownRateInput.classList.remove('bg-gray-900', 'border-gray-800');
+                drawdownRateInput.classList.add('bg-gray-700', 'border-gray-600');
+                
+                fixedWithdrawalAmountInput.disabled = true;
+                fixedWithdrawalAmountInput.value = '';
+                fixedWithdrawalAmountInput.classList.remove('bg-gray-700', 'border-gray-600');
+                fixedWithdrawalAmountInput.classList.add('bg-gray-900', 'border-gray-800');
+                
+                withdrawalFrequencyRadios.forEach(radio => radio.disabled = true);
+            } else {
+                drawdownRateInput.disabled = true;
+                drawdownRateInput.value = '';
+                drawdownRateInput.classList.remove('bg-gray-700', 'border-gray-600');
+                drawdownRateInput.classList.add('bg-gray-900', 'border-gray-800');
+                
+                fixedWithdrawalAmountInput.disabled = false;
+                fixedWithdrawalAmountInput.classList.remove('bg-gray-900', 'border-gray-800');
+                fixedWithdrawalAmountInput.classList.add('bg-gray-700', 'border-gray-600');
+                
+                withdrawalFrequencyRadios.forEach(radio => radio.disabled = false);
+            }
         }
 
         /**
@@ -403,10 +539,10 @@
                 const row = document.createElement('tr');
                 row.classList.add('bg-gray-800', 'border-b', 'border-gray-700', 'hover:bg-gray-700', 'transition-colors');
                 
-                const yearCell = document.createElement('td');
-                yearCell.classList.add('py-2', 'px-2', 'font-medium', 'text-gray-200', 'table-cell-sm');
+                const ageCell = document.createElement('td');
+                ageCell.classList.add('py-2', 'px-2', 'font-medium', 'text-gray-200', 'table-cell-sm');
                 // Display the calculated age directly in the table cell
-                yearCell.textContent = startingAge + item.year;
+                ageCell.textContent = startingAge + item.year;
 
                 const openingBalanceCell = document.createElement('td');
                 openingBalanceCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
@@ -416,6 +552,10 @@
                 contributionsCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
                 contributionsCell.textContent = currency + formatCurrency(item.contributions, 2);
                 
+                const withdrawalsCell = document.createElement('td');
+                withdrawalsCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
+                withdrawalsCell.textContent = currency + formatCurrency(item.withdrawals, 2);
+
                 const interestEarnedCell = document.createElement('td');
                 interestEarnedCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
                 interestEarnedCell.textContent = currency + formatCurrency(item.interestEarned, 2);
@@ -424,9 +564,10 @@
                 closingBalanceCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
                 closingBalanceCell.textContent = currency + formatCurrency(item.closingBalance, 2);
 
-                row.appendChild(yearCell);
+                row.appendChild(ageCell);
                 row.appendChild(openingBalanceCell);
                 row.appendChild(contributionsCell);
+                row.appendChild(withdrawalsCell);
                 row.appendChild(interestEarnedCell);
                 row.appendChild(closingBalanceCell);
                 
@@ -711,6 +852,7 @@
 
         // Initial setup on page load
         function initialize() {
+            toggleDrawdownFields(); // Set initial state
             resizeCanvas(); // Set the canvas size initially
             // Initial calculation is not run on load to avoid error messages with empty fields.
             window.addEventListener('resize', () => {
