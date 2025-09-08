@@ -77,7 +77,7 @@
                     <div class="relative">
                         <label for="principal" class="block text-sm font-medium text-gray-400 mb-1">Initial Balance</label>
                         <div class="relative flex items-center">
-                            <span id="principal-currency-symbol" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
                             <input type="text" id="principal" inputmode="numeric" onfocus="this.select()" oninput="formatLive(this)" onblur="formatInput(this)" class="w-full pl-8 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                         <div class="flex items-center space-x-2">
                             <!-- Contribution Input with Currency Symbol -->
                             <div class="relative flex-1">
-                                <span id="contribution-currency-symbol" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">£</span>
                                 <input type="text" id="contribution" inputmode="numeric" onfocus="this.select()" oninput="formatLive(this)" onblur="formatInput(this)" class="w-full pl-8 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
                             </div>
                             <!-- Contribution Frequency Toggles -->
@@ -110,23 +110,23 @@
                         <label for="rate" class="block text-sm font-medium text-gray-400 mb-1">Annual Interest Rate (%)</label>
                         <input type="number" id="rate" inputmode="numeric" value="5" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
                     </div>
-                    
-                    <!-- Years Input -->
-                    <div>
-                        <label for="years" class="block text-sm font-medium text-gray-400 mb-1">Number of Years</label>
-                        <input type="number" id="years" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
-                    </div>
 
-                    
-                    <!-- Currency Dropdown -->
+                    <!-- New: Starting Age Input -->
                     <div>
-                        <label for="currency" class="block text-sm font-medium text-gray-400 mb-1">Currency</label>
-                        <select id="currency" onchange="updateCurrencySymbols()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200">
-                            <option value="£" selected>GBP (£)</option>
-                            <option value="$">USD ($)</option>
-                            <option value="€">EUR (€)</option>
-                            <option value="¥">JPY (¥)</option>
-                        </select>
+                        <label for="startingAge" class="block text-sm font-medium text-gray-400 mb-1">Starting Age</label>
+                        <input type="number" id="startingAge" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                    </div>
+                    
+                    <!-- New: Age to Calculate To Input -->
+                    <div>
+                        <label for="ageToCalculateTo" class="block text-sm font-medium text-gray-400 mb-1">Age to Calculate To</label>
+                        <input type="number" id="ageToCalculateTo" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
+                    </div>
+                    
+                    <!-- Age to Stop Contributing Input, now optional -->
+                    <div>
+                        <label for="ageToStop" class="block text-sm font-medium text-gray-400 mb-1">Age to Stop Contributing (Optional)</label>
+                        <input type="number" id="ageToStop" inputmode="numeric" onfocus="this.select()" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-200 placeholder-gray-500">
                     </div>
                 </div>
                 <!-- Button to trigger calculation -->
@@ -157,7 +157,7 @@
                     <table class="w-full text-sm text-left text-gray-400">
                         <thead class="text-xs text-gray-200 uppercase bg-gray-700">
                             <tr>
-                                <th scope="col" class="py-2 px-2 table-cell-sm">Year</th>
+                                <th scope="col" class="py-2 px-2 table-cell-sm">Age</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Opening Balance</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Contributions</th>
                                 <th scope="col" class="py-2 px-2 text-right table-cell-sm">Interest Earned</th>
@@ -184,7 +184,7 @@
     <script>
         let growthData = [];
         let contributionsData = [];
-        let currency = '£';
+        const currency = '£';
         const tooltip = document.getElementById('tooltip');
         let chartDimensions = {};
         
@@ -261,8 +261,9 @@
             const principalInput = document.getElementById('principal');
             const contributionInput = document.getElementById('contribution');
             const rateInput = document.getElementById('rate');
-            const yearsInput = document.getElementById('years');
-            const currencyInput = document.getElementById('currency');
+            const startingAgeInput = document.getElementById('startingAge');
+            const ageToCalculateToInput = document.getElementById('ageToCalculateTo');
+            const ageToStopInput = document.getElementById('ageToStop');
             const finalAmountDisplay = document.getElementById('finalAmountValue');
             const contributionsValueDisplay = document.getElementById('contributionsValue');
             const messageBox = document.getElementById('message');
@@ -270,15 +271,40 @@
             // Set default values for empty inputs, cleaning formatted strings
             const P = principalInput.value === '' ? 0 : parseFloat(cleanNumberString(principalInput.value));
             const C = contributionInput.value === '' ? 0 : parseFloat(cleanNumberString(contributionInput.value));
-            const t = yearsInput.value === '' ? 0 : parseFloat(yearsInput.value);
             const r = parseFloat(rateInput.value) / 100; // Convert percentage to decimal
-            currency = currencyInput.value;
+            const startingAge = startingAgeInput.value === '' ? null : parseFloat(startingAgeInput.value);
+            const ageToCalculateTo = ageToCalculateToInput.value === '' ? null : parseFloat(ageToCalculateToInput.value);
+
+            // Handle the optional "ageToStop" field
+            let ageToStop;
+            if (ageToStopInput.value === '') {
+                // If left blank, assume contributions last for the full duration
+                ageToStop = ageToCalculateTo;
+            } else {
+                ageToStop = parseFloat(ageToStopInput.value);
+            }
+            
+            // New logic for calculating years based on age inputs
+            if (startingAge === null || ageToCalculateTo === null) {
+                messageBox.textContent = 'Please enter a value for both starting age and age to calculate to.';
+                messageBox.style.display = 'block';
+                return;
+            }
+
+            if (startingAge >= ageToCalculateTo || ageToStop > ageToCalculateTo || startingAge > ageToStop) {
+                messageBox.textContent = 'Please ensure Starting Age ≤ Age to Stop Contributing ≤ Age to Calculate To.';
+                messageBox.style.display = 'block';
+                return;
+            }
+
+            const totalYears = ageToCalculateTo - startingAge;
+            const contributionYears = ageToStop - startingAge;
 
             // Determine contribution frequency
             const isMonthly = document.querySelector('input[name="contributionFrequency"]:checked').value === 'monthly';
             
             // Validate inputs
-            if (isNaN(P) || isNaN(C) || isNaN(r) || isNaN(t) || P < 0 || C < 0 || r < 0 || t < 0) {
+            if (isNaN(P) || isNaN(C) || isNaN(r) || isNaN(totalYears) || isNaN(contributionYears) || P < 0 || C < 0 || r < 0) {
                 messageBox.textContent = 'Please enter valid non-negative numbers for all fields.';
                 messageBox.style.display = 'block';
                 return;
@@ -294,19 +320,23 @@
             contributionsData = [{ year: 0, amount: P }];
             const tableData = [];
 
-            for (let i = 1; i <= t; i++) {
+            for (let i = 1; i <= totalYears; i++) {
                 let contributionsThisYear = 0;
                 let monthlyBalance = openingBalance;
-
-                // Add annual contribution at the beginning of the year if selected
-                if (!isMonthly) {
-                    monthlyBalance += C;
-                    contributionsThisYear = C;
+                
+                // Only add contributions if the current year is within the contribution period
+                if (i <= contributionYears) {
+                    // Add annual contribution at the beginning of the year if selected
+                    if (!isMonthly) {
+                        monthlyBalance += C;
+                        contributionsThisYear = C;
+                    }
                 }
                 
                 // Monthly loop for compounding
                 for (let j = 0; j < 12; j++) {
-                    if (isMonthly) {
+                    // Only add monthly contributions if the current year is within the contribution period
+                    if (i <= contributionYears && isMonthly) {
                         monthlyBalance += C;
                         contributionsThisYear += C;
                     }
@@ -325,8 +355,12 @@
                 });
                 
                 openingBalance = closingBalanceThisYear;
-                totalContributions += contributionsThisYear;
 
+                // Only add contributions to the total if they were made this year
+                if (i <= contributionYears) {
+                    totalContributions += contributionsThisYear;
+                }
+                
                 growthData.push({ year: i, amount: openingBalance });
                 contributionsData.push({ year: i, amount: totalContributions });
             }
@@ -337,22 +371,23 @@
             animateValue(contributionsValueDisplay, totalContributions, animationDuration);
 
             // Animate the chart drawing
-            animateChart(animationDuration);
+            animateChart(startingAge, animationDuration);
 
             // Render the table
-            renderTable(tableData);
+            renderTable(tableData, startingAge);
         }
 
         /**
          * Animates the chart drawing.
+         * @param {number} startingAge The user's starting age.
          * @param {number} duration The animation duration in milliseconds.
          */
-        function animateChart(duration) {
+        function animateChart(startingAge, duration) {
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                drawChart(null, progress);
+                drawChart(null, startingAge, progress);
                 if (progress < 1) {
                     window.requestAnimationFrame(step);
                 }
@@ -360,17 +395,18 @@
             window.requestAnimationFrame(step);
         }
 
-        function renderTable(data) {
+        function renderTable(data, startingAge) {
             const tableBody = document.getElementById('resultsTableBody');
             tableBody.innerHTML = ''; // Clear existing content
 
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.classList.add('bg-gray-800', 'border-b', 'border-gray-700', 'hover:bg-gray-700', 'transition-colors');
                 
                 const yearCell = document.createElement('td');
                 yearCell.classList.add('py-2', 'px-2', 'font-medium', 'text-gray-200', 'table-cell-sm');
-                yearCell.textContent = item.year;
+                // Display the calculated age directly in the table cell
+                yearCell.textContent = startingAge + item.year;
 
                 const openingBalanceCell = document.createElement('td');
                 openingBalanceCell.classList.add('py-2', 'px-2', 'text-right', 'table-cell-sm');
@@ -412,9 +448,10 @@
         /**
          * Draws the chart.
          * @param {number|null} hoverYear The year being hovered over.
+         * @param {number} startingAge The user's starting age.
          * @param {number} [progress=1] The animation progress (0 to 1).
          */
-        function drawChart(hoverYear, progress = 1) {
+        function drawChart(hoverYear, startingAge, progress = 1) {
             const canvas = document.getElementById('growthChart');
             const ctx = canvas.getContext('2d');
             
@@ -454,7 +491,8 @@
                 paddingTop, paddingRight, paddingBottom, paddingLeft,
                 chartWidth, chartHeight,
                 canvasWidth: canvas.offsetWidth,
-                canvasHeight: canvas.offsetHeight
+                canvasHeight: canvas.offsetHeight,
+                startingAge: startingAge, // Store starting age for mouse events
             };
 
             // Draw axes
@@ -483,13 +521,14 @@
                 ctx.stroke();
             }
 
-            // X-axis labels
+            // X-axis labels (Age)
             ctx.textAlign = 'center';
             const numXLabels = Math.min(maxYear, 10);
             for (let i = 0; i <= numXLabels; i++) {
                 const year = Math.round(maxYear / numXLabels * i);
+                const age = startingAge + year;
                 const x = paddingLeft + (chartWidth / numXLabels) * i;
-                ctx.fillText(year, x, paddingTop + chartHeight + 20);
+                ctx.fillText(age, x, paddingTop + chartHeight + 20);
             }
             
             // Draw Legend
@@ -583,19 +622,6 @@
             }
         }
 
-        function updateCurrencySymbols() {
-            const currencySymbol = document.getElementById('currency').value;
-            const principalInput = document.getElementById('principal');
-            const contributionInput = document.getElementById('contribution');
-
-            document.getElementById('principal-currency-symbol').textContent = currencySymbol;
-            document.getElementById('contribution-currency-symbol').textContent = currencySymbol;
-            
-            // Re-format the values to show the new currency symbol
-            formatInput(principalInput);
-            formatInput(contributionInput);
-        }
-
         function getMousePos(canvas, evt) {
             const rect = canvas.getBoundingClientRect();
             return {
@@ -616,6 +642,7 @@
             const chartHeight = chartDimensions.chartHeight;
             const maxAmount = Math.max(...growthData.map(d => d.amount));
             const maxYear = growthData.length > 0 ? growthData[growthData.length - 1].year : 0;
+            const startingAge = chartDimensions.startingAge;
             
             // Calculate the year value based on the mouse's horizontal position
             const xInChart = x - paddingLeft;
@@ -645,7 +672,7 @@
                     const yPos = paddingTop + chartHeight - (interpolatedInvestment * yScale);
                     
                     // Draw highlight dot at interpolated position
-                    drawChart(null);
+                    drawChart(null, startingAge);
                     const ctx = canvas.getContext('2d');
                     ctx.fillStyle = '#63b3ed';
                     ctx.beginPath();
@@ -653,14 +680,15 @@
                     ctx.fill();
 
                     // Show tooltip at the interpolated position
-                    showTooltip({x: xPos, y: yPos}, {year: yearFraction.toFixed(1), amount: interpolatedInvestment}, {year: yearFraction.toFixed(1), amount: interpolatedContributions});
+                    const interpolatedAge = startingAge + yearFraction;
+                    showTooltip({x: xPos, y: yPos}, {age: interpolatedAge, amount: interpolatedInvestment}, {age: interpolatedAge, amount: interpolatedContributions});
                 } else {
                     hideTooltip();
-                    drawChart(null);
+                    drawChart(null, startingAge);
                 }
             } else {
                 hideTooltip();
-                drawChart(null);
+                drawChart(null, startingAge);
             }
         }
 
@@ -669,7 +697,7 @@
             tooltip.style.top = `${pos.y}px`;
             tooltip.style.opacity = '1';
             tooltip.innerHTML = `
-                <p class="font-bold">Year ${investment.year}</p>
+                <p class="font-bold">Age ${investment.age.toFixed(1)}</p>
                 <p>Investment: ${currency}${formatCurrency(investment.amount, 2)}</p>
                 <p>Contributions: ${currency}${formatCurrency(contributions.amount, 2)}</p>
             `;
@@ -678,12 +706,11 @@
         function hideTooltip() {
             if (growthData.length === 0) return;
             tooltip.style.opacity = '0';
-            drawChart(null); // Redraw to remove highlight
+            drawChart(null, chartDimensions.startingAge); // Redraw to remove highlight
         }
 
         // Initial setup on page load
         function initialize() {
-            updateCurrencySymbols(); // Set initial currency symbols
             resizeCanvas(); // Set the canvas size initially
             // Initial calculation is not run on load to avoid error messages with empty fields.
             window.addEventListener('resize', () => {
@@ -696,5 +723,3 @@
     </script>
 </body>
 </html>
-
-
