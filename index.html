@@ -2,54 +2,45 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pathorium - Solutions for Scientists</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathorium - Solutions for Scientists</title>
 
-  <!-- Tailwind still available if you want utilities -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- External stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .gradient-text {
+      background: linear-gradient(90deg, #6366f1, #d946ef);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
 </head>
 
-<body>
-  <div class="bg-slate-900 text-slate-50 flex flex-col min-h-screen">
-    
-    <!-- Navigation -->
-    <nav class="p-6">
-      <div class="container mx-auto">
-        <a href="https://pathorium.com" class="text-2xl font-bold gradient-text">Pathorium</a>
-      </div>
-    </nav>
+<body class="bg-slate-900 text-slate-50 flex flex-col min-h-screen">
 
-    <!-- Main content -->
-    <main class="container mx-auto px-4 py-8 flex-grow">
-      <div class="grid md:grid-cols-2 gap-8">
-        <a href="pathorium.com/timers" class="bg-slate-800 p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          <h2 class="text-xl font-semibold mb-2">Timers</h2>
-          <p class="text-slate-400">Keep track of your experiments and processes with precision.</p>
-        </a>
-        <a href="pathorium.com/compound" class="bg-slate-800 p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          <h2 class="text-xl font-semibold mb-2">Compound Interest Calculator</h2>
-          <p class="text-slate-400">Calculate future value of your investments with our easy-to-use tool.</p>
-        </a>
-      </div>
-    </main>
+  <!-- Main content - Centered Hero Text -->
+  <main class="flex-grow flex items-center justify-center p-4 text-center">
+    <h1 class="text-7xl md:text-8xl font-bold gradient-text">Pathorium</h1>
+  </main>
 
-    <!-- Footer -->
-    <footer class="p-6 text-center text-slate-400">
-      <p>© 2025 pathorium.com. All rights reserved.</p>
-      <p>Pathorium 🧪 solutions for scientists</p>
-    </footer>
+  <!-- Footer -->
+  <footer class="p-6 text-center text-slate-400">
+    <p>© 2025 pathorium.com. All rights reserved.</p>
+    <p>Pathorium 🧪 solutions for scientists</p>
+  </footer>
 
-  </div>
 </body>
 
 </html>
-
