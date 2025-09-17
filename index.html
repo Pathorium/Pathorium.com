@@ -144,11 +144,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       const gradientOverlay = document.getElementById('gradient-overlay');
       const mainContent = document.querySelector('main');
-      const mainContentHeight = mainContent.offsetHeight;
       const header = document.getElementById('header');
 
       const updatePageOnScroll = () => {
         const scrollPosition = window.scrollY;
+        const mainContentHeight = mainContent.offsetHeight;
 
         // Fades the gradient background as the user scrolls
         const opacity = 1 - Math.min(scrollPosition / mainContentHeight, 1);
