@@ -24,7 +24,8 @@
       font-family: 'Inter', sans-serif;
       /* The body's solid black background will show as the gradient fades */
       background-color: #000000;
-      /* Remove the gradient from here */
+      /* Add top padding to prevent content from hiding behind the fixed header */
+      padding-top: 5rem;
     }
 
     .gradient-text {
@@ -52,6 +53,14 @@
       z-index: -10;
       pointer-events: none;
     }
+
+    /* Class for the scrolled state of the header */
+    .scrolled-header {
+        background-color: transparent;
+        backdrop-filter: blur(8px);
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
   </style>
 </head>
 
@@ -61,7 +70,7 @@
   <div id="gradient-overlay"></div>
 
   <!-- Navigation Bar -->
-  <header class="p-4 flex justify-between items-center mx-12 border-b border-slate-700">
+  <header id="header" class="fixed top-0 w-full z-50 py-4 px-12 flex justify-between items-center transition-all duration-300">
     <a href="#" class="text-2xl font-bold gradient-text">Pathorium</a>
     <nav>
       <ul class="flex space-x-6 text-slate-400">
@@ -136,23 +145,28 @@
       const gradientOverlay = document.getElementById('gradient-overlay');
       const mainContent = document.querySelector('main');
       const mainContentHeight = mainContent.offsetHeight;
+      const header = document.getElementById('header');
 
-      const updateGradient = () => {
+      const updatePageOnScroll = () => {
         const scrollPosition = window.scrollY;
 
-        // The opacity will fade over the height of the main content section
+        // Fades the gradient background as the user scrolls
         const opacity = 1 - Math.min(scrollPosition / mainContentHeight, 1);
-
-        // Update the colors with the new opacity
         const startColor = `rgba(17, 42, 61, ${opacity})`;
         const middleColor = `rgba(6, 17, 31, ${opacity})`;
-
         gradientOverlay.style.background = `radial-gradient(circle at center, ${startColor} 0%, ${middleColor} 99%, rgba(0,0,0,1) 100%)`;
+
+        // Adds or removes the "scrolled" class on the header
+        if (scrollPosition > 50) {
+          header.classList.add('scrolled-header');
+        } else {
+          header.classList.remove('scrolled-header');
+        }
       };
 
-      // Set initial gradient and add scroll listener
-      updateGradient();
-      window.addEventListener('scroll', updateGradient);
+      // Set initial state and add scroll listener
+      updatePageOnScroll();
+      window.addEventListener('scroll', updatePageOnScroll);
     });
   </script>
 
