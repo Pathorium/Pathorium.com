@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast HER2 ISH Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .counter-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+        .count-display {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #1a202c; /* dark gray */
+            min-height: 3.5rem; /* prevent CLS */
+        }
+        .counter-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #4a5568; /* medium gray */
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="counter-card">
+        <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">Breast HER2 D-DISH Counter</h1>
+        <p class="text-center text-sm mb-8 text-gray-500">Use keys <span class="font-semibold text-gray-800">Z</span>, <span class="font-semibold text-gray-800">X</span>, <span class="font-semibold text-gray-800">C</span> to count.</p>
+
+        <div id="counter-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- HER2 Counter (Z key) - Black/Gray -->
+            <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-100">
+                <div id="her2-count" class="count-display text-gray-900">0</div>
+                <div class="counter-label">HER2 Signals (<span class="font-bold">Z</span>)</div>
+                <button id="her2-button" class="w-full py-3 px-4 bg-gray-700 hover:bg-gray-800 active:bg-gray-900 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-gray-400">
+                    +1 HER2
+                </button>
+            </div>
+
+            <!-- CEP17 Counter (X key) - Red -->
+            <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-100">
+                <div id="cep17-count" class="count-display text-red-600">0</div>
+                <div class="counter-label">CEP17 Signals (<span class="font-bold">X</span>)</div>
+                <button id="cep17-button" class="w-full py-3 px-4 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-red-300">
+                    +1 CEP17
+                </button>
+            </div>
+            
+            <!-- Cells Counter (C key) - Green -->
+            <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-100">
+                <div id="cells-count" class="count-display text-green-600">0</div>
+                <div class="counter-label">Cells Counted (<span class="font-bold">C</span>)</div>
+                <button id="cells-button" class="w-full py-3 px-4 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-green-300">
+                    +1 Cells
+                </button>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="mt-8">
+            <button id="reset-button" class="w-full py-3 px-4 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 text-gray-800 font-bold rounded-lg transition duration-150 transform hover:scale-[1.01] shadow-md shadow-gray-400">
+                Reset All Counters
+            </button>
+        </div>
+        
+        <!-- Status Display (Updated for two lines) -->
+        <div id="amplification-status-display" class="mt-8 p-4 border-l-4 rounded-md shadow-inner text-center">
+            <p class="text-lg font-semibold">HER2 Amplification Status</p>
+            <!-- Main status (e.g., "Amplified") -->
+            <div id="main-status-text" class="text-3xl font-extrabold mb-1">Pending</div>
+            <!-- Details line (e.g., "Ratio > 2.0, Counted 40 cells") -->
+            <div id="status-details" class="text-base font-medium">Count at least 20 Cells.</div>
+        </div>
+        
+        <!-- Detailed Metrics Box (UPDATED to 4-column grid for 4 metrics) -->
+        <div class="mt-4 p-4 bg-gray-100 border-l-4 border-gray-500 text-gray-800 rounded-md shadow-inner">
+            <p class="text-xl font-bold mb-3 text-gray-700">Detailed Metrics</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm font-medium">
+                
+                <!-- Total Cells Counted -->
+                <div class="bg-white p-3 rounded-lg border text-center">
+                    <span class="font-semibold block text-gray-600">Nuclei evaluated:</span>
+                    <span id="total-cells-counted-details" class="text-xl font-extrabold text-indigo-600">0</span>
+                </div>
+                
+                <div class="bg-white p-3 rounded-lg border text-center">
+                    <span class="font-semibold block text-gray-600">Mean HER2 per cell:</span>
+                    <span id="avg-her2" class="text-xl font-extrabold text-indigo-600">0.00</span>
+                </div>
+                
+                <div class="bg-white p-3 rounded-lg border text-center">
+                    <span class="font-semibold block text-gray-600">Mean CEP17 per cell:</span>
+                    <span id="avg-cep17" class="text-xl font-extrabold text-indigo-600">0.00</span>
+                </div>
+                
+                <div class="bg-white p-3 rounded-lg border text-center">
+                    <span class="font-semibold block text-gray-600">HER2/CEP17 Ratio:</span>
+                    <span id="overall-ratio-details" class="text-xl font-extrabold text-indigo-600">0.00</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Client-side state object
+        let counters = {
+            cells: 0,
+            her2: 0,
+            cep17: 0
+        };
+
+        // Key for session storage to track the required maximum count (20 or 40)
+        const MAX_COUNT_KEY = 'HER2_MAX_COUNT';
+        
+        /**
+         * Persists the required maximum cell count (20 or 40) in session storage.
+         * This locks the state for the current counting session.
+         */
+        function getRequiredMaxCount() {
+            const storedMax = sessionStorage.getItem(MAX_COUNT_KEY);
+            // Default to 20 if not set or invalid
+            return storedMax && !isNaN(parseInt(storedMax, 10)) ? parseInt(storedMax, 10) : 20;
+        }
+
+        function setRequiredMaxCount(count) {
+            sessionStorage.setItem(MAX_COUNT_KEY, count);
+        }
+        
+        // UI elements map
+        const countElements = {
+            cells: document.getElementById('cells-count'),
+            her2: document.getElementById('her2-count'),
+            cep17: document.getElementById('cep17-count')
+        };
+        const buttonElements = {
+            cells: document.getElementById('cells-button'),
+            her2: document.getElementById('her2-button'),
+            cep17: document.getElementById('cep17-button'),
+            reset: document.getElementById('reset-button')
+        };
+        
+        // Ratio and Status elements
+        const amplificationStatusContainer = document.getElementById('amplification-status-display');
+        const mainStatusElement = document.getElementById('main-status-text');
+        const statusDetailsElement = document.getElementById('status-details');
+        
+        // Detailed Metrics elements
+        const totalCellsCountedDetails = document.getElementById('total-cells-counted-details');
+        const avgHer2Element = document.getElementById('avg-her2');
+        const avgCep17Element = document.getElementById('avg-cep17');
+        const overallRatioDetailsElement = document.getElementById('overall-ratio-details');
+
+
+        /**
+         * Calculates the ratio and determines the HER2 Amplification Status based on the scoring guidelines,
+         * with state locking for better UX.
+         */
+        function updateAmplificationStatus() {
+            const H = counters.her2;
+            const C = counters.cep17;
+            const L = counters.cells; // Total Cells Counted
+            
+            // Ratio calculation remains HER2/CEP17
+            const R = C === 0 ? 0 : H / C; 
+
+            let mainStatus;
+            let detailsText;
+            let statusClass;
+            
+            // Determine if we are in the equivocal zone (1.8 <= R <= 2.2)
+            const isEquivocalZone = (R >= 1.8 && R <= 2.2);
+            
+            let requiredMaxCount = getRequiredMaxCount();
+
+            // PHASE 1: Decide Required Count based on L=20 reading (if not already set to 40)
+            if (L === 20 && isEquivocalZone && requiredMaxCount === 20) {
+                // Equivocal condition is met at 20 cells for the first time
+                requiredMaxCount = 40;
+                setRequiredMaxCount(40);
+            }
+            // If L=20 and not equivocal, requiredMaxCount remains 20.
+
+            // PHASE 2: Determine Status based on current L vs. requiredMaxCount
+
+            if (L < 20) {
+                // 1. PENDING (L < 20)
+                mainStatus = "Pending";
+                detailsText = "Count at least 20 Cells.";
+                statusClass = "bg-blue-100 border-blue-500 text-blue-800";
+            } else if (L < requiredMaxCount) {
+                // 2. INTERMEDIATE STATE (L is >= 20 but less than the required Max)
+                if (requiredMaxCount === 40) {
+                    // Status remains Equivocal until 40 is reached, regardless of ratio fluctuations
+                    mainStatus = "Equivocal";
+                    detailsText = `Ratio ${R.toFixed(2)}. Count 40 Cells to resolve (Current: ${L}).`;
+                    statusClass = "bg-orange-100 border-orange-500 text-orange-800";
+                }
+
+            } else {
+                // 3. FINAL DETERMINATION (L >= requiredMaxCount)
+                const ratioText = R.toFixed(2);
+                
+                if (R < 2.0) {
+                    mainStatus = "NEGATIVE (Not Amplified)";
+                } else { // R >= 2.0
+                    mainStatus = "POSITIVE (Amplified)";
+                }
+
+                // Use a neutral color for all final results
+                statusClass = "bg-gray-100 border-gray-500 text-gray-800"; 
+                
+                // Set details text
+                detailsText = `(Total ${L} cells). Ratio ${ratioText} is ${R < 2.0 ? '<' : '≥'} 2.0.`;
+            }
+
+            // Apply classes and text to the display elements
+            amplificationStatusContainer.className = `mt-8 p-4 border-l-4 rounded-md shadow-inner text-center ${statusClass}`;
+            mainStatusElement.textContent = mainStatus;
+            statusDetailsElement.textContent = detailsText;
+        }
+
+
+        /**
+         * Calculates and updates the detailed metrics box (Averages, Ratio, and Total Cells).
+         */
+        function updateDetailsBox() {
+            const H = counters.her2;
+            const C = counters.cep17;
+            const L = counters.cells;
+            
+            let avgHer2, avgCep17, overallRatio;
+
+            // Update Total Cells Counted
+            totalCellsCountedDetails.textContent = L;
+
+            // Average HER2 per cell
+            if (L === 0) {
+                avgHer2 = "0.00";
+            } else {
+                avgHer2 = (H / L).toFixed(2);
+            }
+
+            // Average CEP17 per cell
+            if (L === 0) {
+                avgCep17 = "0.00";
+            } else {
+                avgCep17 = (C / L).toFixed(2);
+            }
+
+            // Overall HER2/CEP17 ratio
+            if (C === 0) {
+                overallRatio = H === 0 ? "0.00" : "N/A";
+            } else {
+                overallRatio = (H / C).toFixed(2);
+            }
+
+            avgHer2Element.textContent = avgHer2;
+            avgCep17Element.textContent = avgCep17;
+            overallRatioDetailsElement.textContent = overallRatio;
+        }
+
+        /**
+         * Updates the visual display for all counters and the derived metrics.
+         */
+        function updateDisplay() {
+            // Update individual counts
+            countElements.cells.textContent = counters.cells;
+            countElements.her2.textContent = counters.her2;
+            countElements.cep17.textContent = counters.cep17;
+            
+            // Update derived metrics
+            updateAmplificationStatus();
+            updateDetailsBox();
+        }
+
+        /**
+         * Increments a specific counter field and updates the display.
+         * @param {string} field - The name of the counter to increment ('cells', 'her2', or 'cep17').
+         */
+        function incrementCounter(field) {
+            if (counters.hasOwnProperty(field)) {
+                counters[field]++;
+                updateDisplay();
+            }
+        }
+
+        /**
+         * Resets all counter values to zero, clears the session lock, and updates the display.
+         */
+        function resetCounters() {
+            counters.cells = 0;
+            counters.her2 = 0;
+            counters.cep17 = 0;
+            // Reset the required max count lock
+            sessionStorage.removeItem(MAX_COUNT_KEY);
+            updateDisplay();
+        }
+
+        /**
+         * Handles keyboard input to increment counters based on the mapping (Z -> HER2, X -> CEP17, C -> Cells).
+         * @param {KeyboardEvent} event - The keyboard event object.
+         */
+        function handleKeyPress(event) {
+            const key = event.key.toLowerCase();
+            switch (key) {
+                case 'z':
+                    incrementCounter('her2');
+                    break;
+                case 'x':
+                    incrementCounter('cep17');
+                    break;
+                case 'c':
+                    incrementCounter('cells');
+                    break;
+            }
+        }
+
+        // Attach event listeners when the window loads
+        window.onload = function() {
+            // Initial display setup
+            updateDisplay();
+
+            // Attach listeners to increment buttons
+            buttonElements.cells.addEventListener('click', () => incrementCounter('cells'));
+            buttonElements.her2.addEventListener('click', () => incrementCounter('her2'));
+            buttonElements.cep17.addEventListener('click', () => incrementCounter('cep17'));
+
+            // Attach listener to reset button
+            buttonElements.reset.addEventListener('click', resetCounters);
+
+            // Attach keyboard listener for Z, X, C
+            document.addEventListener('keydown', handleKeyPress);
+        };
+    </script>
+</body>
+</html>
