@@ -69,7 +69,7 @@
   <!-- Dynamic Gradient Overlay -->
   <div id="gradient-overlay"></div>
 
-  <!-- Navigation Bar -->
+  <!-- Navigation Bar (Updated to include 'Tools' link) -->
   <header id="header" class="fixed top-0 w-full z-50 py-4 px-12 flex justify-between items-center transition-all duration-300">
     <a href="#" class="text-2xl font-bold gradient-text">Pathorium</a>
     <nav>
@@ -77,6 +77,7 @@
         <li><a href="#" class="hover:text-white transition-colors duration-200">Home</a></li>
         <li><a href="#mission" class="hover:text-white transition-colors duration-200">About</a></li>
         <li><a href="#services" class="hover:text-white transition-colors duration-200">Services</a></li>
+        <li><a href="her2-counter.html" class="font-bold text-white transition-colors duration-200">Tools</a></li>
         <li><a href="#" class="hover:text-white transition-colors duration-200">Contact</a></li>
       </ul>
     </nav>
@@ -87,8 +88,8 @@
     <div class="space-y-6">
       <h1 class="text-7xl md:text-8xl font-bold gradient-text">Pathorium</h1>
       <p class="text-lg md:text-xl text-slate-400">Solutions for scientists.</p>
-      <a href="#mission" class="inline-block px-8 py-3 rounded-full font-semibold text-white cta-button">
-        Learn More
+      <a href="#services" class="inline-block px-8 py-3 rounded-full font-semibold text-white cta-button">
+        Explore Services
       </a>
     </div>
   </main>
@@ -101,35 +102,46 @@
     </div>
   </section>
   
-  <!-- Our Services section -->
+  <!-- Our Services section (Updated with 4 cards) -->
   <section id="services" class="min-h-screen flex items-center justify-center text-center text-slate-400 border-t border-slate-700 py-16">
     <div class="p-8 max-w-7xl mx-auto">
-        <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-12">Our Services</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-12">Our Services & Tools</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <!-- Service Card 1 -->
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-blue-500 border border-transparent">
                 <div class="text-4xl mb-4 gradient-text">
                     <i class="fas fa-microscope"></i>
                 </div>
                 <h3 class="text-2xl font-semibold text-white mb-2">Data Science</h3>
-                <p>We leverage advanced data analytics and machine learning to uncover hidden patterns and insights from your scientific data.</p>
+                <p class="text-sm">We leverage advanced data analytics and machine learning to uncover hidden patterns and insights from your scientific data.</p>
             </div>
             <!-- Service Card 2 -->
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-green-500 border border-transparent">
                 <div class="text-4xl mb-4 gradient-text">
                     <i class="fas fa-robot"></i>
                 </div>
                 <h3 class="text-2xl font-semibold text-white mb-2">Lab Automation</h3>
-                <p>Automate repetitive lab processes with custom robotic solutions and software to increase efficiency and reduce human error.</p>
+                <p class="text-sm">Automate repetitive lab processes with custom robotic solutions and software to increase efficiency and reduce human error.</p>
             </div>
             <!-- Service Card 3 -->
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-indigo-500 border border-transparent">
                 <div class="text-4xl mb-4 gradient-text">
                     <i class="fas fa-flask"></i>
                 </div>
                 <h3 class="text-2xl font-semibold text-white mb-2">Consulting</h3>
-                <p>Our team of experts provides strategic guidance on research design, data management, and experimental workflows.</p>
+                <p class="text-sm">Our team of experts provides strategic guidance on research design, data management, and experimental workflows.</p>
             </div>
+            <!-- NEW Service Card 4: Clinical Tools -->
+            <a href="her2-counter.html" class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-red-500 border border-transparent flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl mb-4 gradient-text">
+                        <i class="fas fa-vial-virus"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-2">Clinical Tools</h3>
+                    <p class="text-sm">Access specialized calculators and digital tools, like our HER2 ISH counter, for immediate diagnostic support.</p>
+                </div>
+                <span class="text-xs font-semibold mt-4 text-indigo-400">Launch Tool &rarr;</span>
+            </a>
         </div>
     </div>
   </section>
@@ -173,4 +185,3 @@
 </body>
 
 </html>
-
