@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Breast HER2 ISH Counter</title>
+    <title>Breast HER2 D-DISH Counter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
+            background-color: #0d1117; /* Dark background to match site theme */
+            color: #e5e7eb; /* Light text */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,104 +18,120 @@
             padding: 20px;
         }
         .counter-card {
-            background: white;
+            background: #1f2937; /* Dark card background */
             padding: 3rem;
             border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             max-width: 900px;
             width: 100%;
+            border: 1px solid #374151;
         }
         .count-display {
             font-size: 3rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
-            color: #1a202c; /* dark gray */
+            color: #3b82f6; /* Blue for emphasis */
             min-height: 3.5rem; /* prevent CLS */
         }
         .counter-label {
             font-size: 1.125rem;
             font-weight: 600;
-            color: #4a5568; /* medium gray */
+            color: #9ca3af; /* Medium gray text */
             margin-bottom: 1rem;
         }
+        /* Custom styles for matching buttons */
+        .btn-her2 { background-color: #4b5563; }
+        .btn-her2:hover { background-color: #374151; }
+        .btn-cep17 { background-color: #dc2626; } /* Red */
+        .btn-cep17:hover { background-color: #b91c1c; }
+        .btn-cells { background-color: #10b981; } /* Green */
+        .btn-cells:hover { background-color: #059669; }
     </style>
 </head>
 <body>
 
     <div class="counter-card">
-        <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">Breast HER2 D-DISH Counter</h1>
-        <p class="text-center text-sm mb-8 text-gray-500">Use keys <span class="font-semibold text-gray-800">Z</span>, <span class="font-semibold text-gray-800">X</span>, <span class="font-semibold text-gray-800">C</span> to count.</p>
+        <!-- Header with link back to the homepage -->
+        <div class="mb-6 flex justify-between items-center">
+            <a href="index.html" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">&larr; Back to Pathorium</a>
+        </div>
+
+        <!-- Title updated to solid white -->
+        <h1 class="text-3xl font-bold text-center mb-6 text-white">Breast HER2 D-DISH Counter</h1>
+        <p class="text-center text-sm mb-8 text-gray-400">Use keys <span class="font-semibold text-gray-50">Z</span>, <span class="font-semibold text-gray-50">X</span>, <span class="font-semibold text-gray-50">C</span> to count.</p>
 
         <div id="counter-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-            <!-- HER2 Counter (Z key) - Black/Gray -->
-            <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-100">
-                <div id="her2-count" class="count-display text-gray-900">0</div>
+            <!-- HER2 Counter (Z key) - Gray -->
+            <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                <div id="her2-count" class="count-display text-gray-200">0</div>
                 <div class="counter-label">HER2 Signals (<span class="font-bold">Z</span>)</div>
-                <button id="her2-button" class="w-full py-3 px-4 bg-gray-700 hover:bg-gray-800 active:bg-gray-900 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-gray-400">
+                <button id="her2-button" class="btn-her2 w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-gray-700">
                     +1 HER2
                 </button>
             </div>
 
             <!-- CEP17 Counter (X key) - Red -->
-            <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-100">
-                <div id="cep17-count" class="count-display text-red-600">0</div>
+            <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                <div id="cep17-count" class="count-display text-red-400">0</div>
                 <div class="counter-label">CEP17 Signals (<span class="font-bold">X</span>)</div>
-                <button id="cep17-button" class="w-full py-3 px-4 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-red-300">
+                <button id="cep17-button" class="btn-cep17 w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-red-700">
                     +1 CEP17
                 </button>
             </div>
             
             <!-- Cells Counter (C key) - Green -->
-            <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-100">
-                <div id="cells-count" class="count-display text-green-600">0</div>
+            <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                <div id="cells-count" class="count-display text-green-400">0</div>
                 <div class="counter-label">Cells Counted (<span class="font-bold">C</span>)</div>
-                <button id="cells-button" class="w-full py-3 px-4 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-green-300">
-                    +1 Cells
+                <button id="cells-button" class="btn-cells w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-green-700">
+                    +1 Nucleus
                 </button>
             </div>
         </div>
 
         <!-- Reset Button -->
         <div class="mt-8">
-            <button id="reset-button" class="w-full py-3 px-4 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 text-gray-800 font-bold rounded-lg transition duration-150 transform hover:scale-[1.01] shadow-md shadow-gray-400">
+            <button id="reset-button" class="w-full py-3 px-4 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white font-bold rounded-lg transition duration-150 transform hover:scale-[1.01] shadow-md shadow-gray-800">
                 Reset All Counters
             </button>
         </div>
         
-        <!-- Status Display (Updated for two lines) -->
-        <div id="amplification-status-display" class="mt-8 p-4 border-l-4 rounded-md shadow-inner text-center">
+        <!-- Status Display -->
+        <!-- Updated border class from border-l-4 to border border-gray-700 -->
+        <div id="amplification-status-display" class="mt-8 p-4 border rounded-md shadow-inner text-center">
             <p class="text-lg font-semibold">HER2 Amplification Status</p>
             <!-- Main status (e.g., "Amplified") -->
             <div id="main-status-text" class="text-3xl font-extrabold mb-1">Pending</div>
             <!-- Details line (e.g., "Ratio > 2.0, Counted 40 cells") -->
-            <div id="status-details" class="text-base font-medium">Count at least 20 Cells.</div>
+            <div id="status-details" class="text-base font-medium">Count at least 20 Nuclei.</div>
         </div>
         
-        <!-- Detailed Metrics Box (UPDATED to 4-column grid for 4 metrics) -->
-        <div class="mt-4 p-4 bg-gray-100 border-l-4 border-gray-500 text-gray-800 rounded-md shadow-inner">
-            <p class="text-xl font-bold mb-3 text-gray-700">Detailed Metrics</p>
+        <!-- Detailed Metrics Box -->
+        <!-- Updated border class from border-l-4 border-indigo-500 to border border-gray-700 -->
+        <div class="mt-4 p-4 bg-gray-800 border border-gray-700 text-gray-200 rounded-md shadow-2xl">
+            <p class="text-xl font-bold mb-3 text-indigo-400">Detailed Metrics</p>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm font-medium">
                 
                 <!-- Total Cells Counted -->
-                <div class="bg-white p-3 rounded-lg border text-center">
-                    <span class="font-semibold block text-gray-600">Nuclei evaluated:</span>
-                    <span id="total-cells-counted-details" class="text-xl font-extrabold text-indigo-600">0</span>
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                    <span class="font-semibold block text-gray-400">Nuclei evaluated:</span>
+                    <span id="total-cells-counted-details" class="text-xl font-extrabold text-indigo-400">0</span>
                 </div>
                 
-                <div class="bg-white p-3 rounded-lg border text-center">
-                    <span class="font-semibold block text-gray-600">Mean HER2 per cell:</span>
-                    <span id="avg-her2" class="text-xl font-extrabold text-indigo-600">0.00</span>
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                    <span class="font-semibold block text-gray-400">Mean HER2 per cell:</span>
+                    <span id="avg-her2" class="text-xl font-extrabold text-indigo-400">0.00</span>
                 </div>
                 
-                <div class="bg-white p-3 rounded-lg border text-center">
-                    <span class="font-semibold block text-gray-600">Mean CEP17 per cell:</span>
-                    <span id="avg-cep17" class="text-xl font-extrabold text-indigo-600">0.00</span>
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                    <span class="font-semibold block text-gray-400">Mean CEP17 per cell:</span>
+                    <span id="avg-cep17" class="text-xl font-extrabold text-indigo-400">0.00</span>
                 </div>
                 
-                <div class="bg-white p-3 rounded-lg border text-center">
-                    <span class="font-semibold block text-gray-600">HER2/CEP17 Ratio:</span>
-                    <span id="overall-ratio-details" class="text-xl font-extrabold text-indigo-600">0.00</span>
+                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                    <span class="font-semibold block text-gray-400">HER2/CEP17 Ratio:</span>
+                    <span id="overall-ratio-details" class="text-xl font-extrabold text-indigo-400">0.00</span>
                 </div>
             </div>
         </div>
@@ -205,36 +222,42 @@
             if (L < 20) {
                 // 1. PENDING (L < 20)
                 mainStatus = "Pending";
-                detailsText = "Count at least 20 Cells.";
-                statusClass = "bg-blue-100 border-blue-500 text-blue-800";
+                detailsText = "Count at least 20 Nuclei.";
+                statusClass = "bg-blue-900 border-blue-500 text-blue-300";
             } else if (L < requiredMaxCount) {
                 // 2. INTERMEDIATE STATE (L is >= 20 but less than the required Max)
                 if (requiredMaxCount === 40) {
                     // Status remains Equivocal until 40 is reached, regardless of ratio fluctuations
                     mainStatus = "Equivocal";
-                    detailsText = `Ratio ${R.toFixed(2)}. Count 40 Cells to resolve (Current: ${L}).`;
-                    statusClass = "bg-orange-100 border-orange-500 text-orange-800";
+                    detailsText = `Ratio ${R.toFixed(2)}. Count 40 Nuclei to resolve (Current: ${L}).`;
+                    statusClass = "bg-orange-900 border-orange-500 text-orange-300";
                 }
 
             } else {
                 // 3. FINAL DETERMINATION (L >= requiredMaxCount)
                 const ratioText = R.toFixed(2);
                 
+                // Neutral class regardless of final result
+                const neutralFinalClass = "bg-gray-800 border-gray-700 text-white";
+
                 if (R < 2.0) {
                     mainStatus = "NEGATIVE (Not Amplified)";
+                    statusClass = neutralFinalClass;
                 } else { // R >= 2.0
                     mainStatus = "POSITIVE (Amplified)";
+                    statusClass = neutralFinalClass;
                 }
-
-                // Use a neutral color for all final results
-                statusClass = "bg-gray-100 border-gray-500 text-gray-800"; 
                 
                 // Set details text
-                detailsText = `(Total ${L} cells). Ratio ${ratioText} is ${R < 2.0 ? '<' : '≥'} 2.0.`;
+                detailsText = `(Total ${L} Nuclei). Ratio ${ratioText} is ${R < 2.0 ? '<' : '≥'} 2.0.`;
             }
 
             // Apply classes and text to the display elements
-            amplificationStatusContainer.className = `mt-8 p-4 border-l-4 rounded-md shadow-inner text-center ${statusClass}`;
+            // Note: The status container already has `border` applied in the HTML. 
+            // We just need to ensure the correct color is applied here if the logic dictates it.
+            // For PENDING/EQUIVOCAL, we apply the custom color border.
+            // For FINAL, we apply the neutral gray border (border-gray-700) and gray background.
+            amplificationStatusContainer.className = `mt-8 p-4 border rounded-md shadow-inner text-center ${statusClass}`;
             mainStatusElement.textContent = mainStatus;
             statusDetailsElement.textContent = detailsText;
         }
