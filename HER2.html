@@ -12,9 +12,17 @@
             background-color: #0d1117; /* Dark background to match site theme */
             color: #e5e7eb; /* Light text */
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; /* Stack children vertically */
+            justify-content: flex-start; /* Start content from the top */
             min-height: 100vh;
+            padding: 0; /* Remove body padding for better footer placement */
+        }
+        /* New wrapper to handle main content centering and growth */
+        .main-content-wrapper {
+            flex-grow: 1; /* Pushes the footer down */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align card to the top of the available space */
             padding: 20px;
         }
         .counter-card {
@@ -50,99 +58,100 @@
 </head>
 <body>
 
-    <div class="counter-card">
-        <!-- Header with link back to the homepage -->
-        <div class="mb-6 flex justify-between items-center">
-            <a href="index.html" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">&larr; Back to Pathorium</a>
-        </div>
-
-        <!-- Title updated to solid white -->
-        <h1 class="text-3xl font-bold text-center mb-6 text-white">HER2 D-DISH Counter</h1>
-        <p class="text-center text-sm mb-8 text-gray-400">Use keys <span class="font-semibold text-gray-50">Z</span>, <span class="font-semibold text-gray-50">X</span>, <span class="font-semibold text-gray-50">C</span> to count.</p>
-
-        <div id="counter-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <!-- HER2 Counter (Z key) - Gray -->
-            <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
-                <div id="her2-count" class="count-display text-gray-200">0</div>
-                <div class="counter-label">HER2 Signals (<span class="font-bold">Z</span>)</div>
-                <button id="her2-button" class="btn-her2 w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-gray-700">
-                    +1 HER2
-                </button>
+    <!-- Main Content Wrapper to push the footer down -->
+    <div class="main-content-wrapper">
+        <div class="counter-card">
+            <!-- Header with link back to the homepage -->
+            <div class="mb-6 flex justify-between items-center">
+                <a href="index.html" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">&larr; Back to Pathorium</a>
             </div>
 
-            <!-- CEP17 Counter (X key) - Red -->
-            <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
-                <div id="cep17-count" class="count-display text-red-400">0</div>
-                <div class="counter-label">CEP17 Signals (<span class="font-bold">X</span>)</div>
-                <button id="cep17-button" class="btn-cep17 w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-red-700">
-                    +1 CEP17
+            <!-- Title updated to solid white -->
+            <h1 class="text-3xl font-bold text-center mb-6 text-white">HER2 D-DISH Counter</h1>
+            <p class="text-center text-sm mb-8 text-gray-400">Use keys <span class="font-semibold text-gray-50">Z</span>, <span class="font-semibold text-gray-50">X</span>, <span class="font-semibold text-gray-50">C</span> to count.</p>
+
+            <div id="counter-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- HER2 Counter (Z key) - Gray -->
+                <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                    <div id="her2-count" class="count-display text-gray-200">0</div>
+                    <div class="counter-label">HER2 Signals (<span class="font-bold">Z</span>)</div>
+                    <button id="her2-button" class="btn-her2 w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-gray-700">
+                        +1 HER2
+                    </button>
+                </div>
+
+                <!-- CEP17 Counter (X key) - Red -->
+                <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                    <div id="cep17-count" class="count-display text-red-400">0</div>
+                    <div class="counter-label">CEP17 Signals (<span class="font-bold">X</span>)</div>
+                    <button id="cep17-button" class="btn-cep17 w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-red-700">
+                        +1 CEP17
+                    </button>
+                </div>
+                
+                <!-- Cells Counter (C key) - Green -->
+                <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                    <div id="cells-count" class="count-display text-green-400">0</div>
+                    <div class="counter-label">Cells Counted (<span class="font-bold">C</span>)</div>
+                    <button id="cells-button" class="btn-cells w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-green-700">
+                        +1 Cell
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reset Button -->
+            <div class="mt-8">
+                <button id="reset-button" class="w-full py-3 px-4 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white font-bold rounded-lg transition duration-150 transform hover:scale-[1.01] shadow-md shadow-gray-800">
+                    Reset All Counters
                 </button>
             </div>
             
-            <!-- Cells Counter (C key) - Green -->
-            <div class="flex flex-col items-center bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
-                <div id="cells-count" class="count-display text-green-400">0</div>
-                <div class="counter-label">Cells Counted (<span class="font-bold">C</span>)</div>
-                <button id="cells-button" class="btn-cells w-full py-3 px-4 text-white font-bold rounded-lg transition duration-150 transform hover:scale-105 shadow-md shadow-green-700">
-                    +1 Cell
-                </button>
+            <!-- Status Display -->
+            <div id="amplification-status-display" class="mt-8 p-4 border rounded-md shadow-inner text-center">
+                <p class="text-lg font-semibold">HER2 Amplification Status</p>
+                <!-- Main status (e.g., "Amplified") -->
+                <div id="main-status-text" class="text-3xl font-extrabold mb-1">Pending</div>
+                <!-- Details line (e.g., "Ratio > 2.0, Counted 40 cells") -->
+                <div id="status-details" class="text-base font-medium">Count at least 20 cells.</div>
             </div>
-        </div>
-
-        <!-- Reset Button -->
-        <div class="mt-8">
-            <button id="reset-button" class="w-full py-3 px-4 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white font-bold rounded-lg transition duration-150 transform hover:scale-[1.01] shadow-md shadow-gray-800">
-                Reset All Counters
-            </button>
-        </div>
-        
-        <!-- Status Display -->
-        <!-- Updated border class from border-l-4 to border border-gray-700 -->
-        <div id="amplification-status-display" class="mt-8 p-4 border rounded-md shadow-inner text-center">
-            <p class="text-lg font-semibold">HER2 Amplification Status</p>
-            <!-- Main status (e.g., "Amplified") -->
-            <div id="main-status-text" class="text-3xl font-extrabold mb-1">Pending</div>
-            <!-- Details line (e.g., "Ratio > 2.0, Counted 40 cells") -->
-            <div id="status-details" class="text-base font-medium">Count at least 20 cells.</div>
-        </div>
-        
-        <!-- Detailed Metrics Box -->
-        <!-- Updated border class from border-l-4 border-indigo-500 to border border-gray-700 -->
-        <div class="mt-4 p-4 bg-gray-800 border border-gray-700 text-gray-200 rounded-md shadow-2xl">
-            <p class="text-xl font-bold mb-3 text-indigo-400">Detailed Metrics</p>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm font-medium">
-                
-                <!-- Total Cells Counted -->
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
-                    <span class="font-semibold block text-gray-400">Nuclei evaluated:</span>
-                    <span id="total-cells-counted-details" class="text-xl font-extrabold text-indigo-400">0</span>
-                </div>
-                
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
-                    <span class="font-semibold block text-gray-400">Mean HER2 per cell:</span>
-                    <span id="avg-her2" class="text-xl font-extrabold text-indigo-400">0.00</span>
-                </div>
-                
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
-                    <span class="font-semibold block text-gray-400">Mean CEP17 per cell:</span>
-                    <span id="avg-cep17" class="text-xl font-extrabold text-indigo-400">0.00</span>
-                </div>
-                
-                <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
-                    <span class="font-semibold block text-gray-400">HER2/CEP17 Ratio:</span>
-                    <span id="overall-ratio-details" class="text-xl font-extrabold text-indigo-400">0.00</span>
+            
+            <!-- Detailed Metrics Box -->
+            <div class="mt-4 p-4 bg-gray-800 border border-gray-700 text-gray-200 rounded-md shadow-2xl">
+                <p class="text-xl font-bold mb-3 text-indigo-400">Detailed Metrics</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm font-medium">
+                    
+                    <!-- Total Cells Counted -->
+                    <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                        <span class="font-semibold block text-gray-400">Nuclei evaluated:</span>
+                        <span id="total-cells-counted-details" class="text-xl font-extrabold text-indigo-400">0</span>
+                    </div>
+                    
+                    <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                        <span class="font-semibold block text-gray-400">Mean HER2 per cell:</span>
+                        <span id="avg-her2" class="text-xl font-extrabold text-indigo-400">0.00</span>
+                    </div>
+                    
+                    <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                        <span class="font-semibold block text-gray-400">Mean CEP17 per cell:</span>
+                        <span id="avg-cep17" class="text-xl font-extrabold text-indigo-400">0.00</span>
+                    </div>
+                    
+                    <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-center">
+                        <span class="font-semibold block text-gray-400">HER2/CEP17 Ratio:</span>
+                        <span id="overall-ratio-details" class="text-xl font-extrabold text-indigo-400">0.00</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 
-      <!-- Footer -->
-  <footer class="p-4 text-center text-slate-400 text-xs mx-12 border-t border-slate-700">
-    <p>© B Pollard 2025 pathorium.com. All rights reserved.</p>
-    <p>Pathorium 🧪 solutions for scientists</p>
-  </footer>
+    <!-- Footer is now positioned outside the main content wrapper -->
+    <footer class="p-4 text-center text-slate-400 text-xs mx-12 border-t border-slate-700 mt-auto">
+        <p>© B Pollard 2025 pathorium.com. All rights reserved.</p>
+        <p>Pathorium 🧪 solutions for scientists</p>
+    </footer>
 
     <script>
         // Client-side state object
@@ -383,8 +392,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
