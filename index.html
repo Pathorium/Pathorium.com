@@ -16,15 +16,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <style>
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
       font-family: 'Inter', sans-serif;
-      /* The body's solid black background will show as the gradient fades */
+      /* Solid black background to serve as the base */
       background-color: #000000;
-      /* Add top padding to prevent content from hiding behind the fixed header */
+      /* Add top padding for fixed header */
       padding-top: 5rem;
     }
 
@@ -45,148 +41,51 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-
-    /* Fixed overlay for the dynamic gradient */
+    
+    /* Fixed overlay for the constant radial gradient */
     #gradient-overlay {
       position: fixed;
       inset: 0;
       z-index: -10;
       pointer-events: none;
-    }
-
-    /* Class for the scrolled state of the header */
-    .scrolled-header {
-        background-color: transparent;
-        backdrop-filter: blur(8px);
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
+      /* Darker gradient: using deeper blue colors */
+      background: radial-gradient(circle at center, rgba(10, 30, 45, 1) 0%, rgba(4, 12, 20, 1) 99%, rgba(0,0,0,1) 100%);
     }
   </style>
 </head>
 
 <body class="text-slate-50 flex flex-col min-h-screen">
 
-  <!-- Dynamic Gradient Overlay -->
+  <!-- Dynamic Gradient Overlay (now static) -->
   <div id="gradient-overlay"></div>
 
-  <!-- Navigation Bar (Updated to include 'Tools' link) -->
-  <header id="header" class="fixed top-0 w-full z-50 py-4 px-12 flex justify-between items-center transition-all duration-300">
+  <!-- Navigation Bar - Adjusted for transparency over the gradient -->
+  <header id="header" class="fixed top-0 w-full z-50 py-4 px-12 flex justify-between items-center transition-all duration-300 bg-black/50 backdrop-blur-sm border-b border-slate-800">
     <a href="#" class="text-2xl font-bold gradient-text">Pathorium</a>
     <nav>
       <ul class="flex space-x-6 text-slate-400">
-        <li><a href="#" class="hover:text-white transition-colors duration-200">Home</a></li>
-        <li><a href="#mission" class="hover:text-white transition-colors duration-200">About</a></li>
-        <li><a href="#services" class="hover:text-white transition-colors duration-200">Services</a></li>
+        <!-- Home link -->
+        <li><a href="index.html" class="hover:text-white transition-colors duration-200">Home</a></li>
+        <!-- Tools link (using original path/styling intention) -->
         <li><a href="HER2.html" class="font-bold text-white transition-colors duration-200">Tools</a></li>
-        <li><a href="#" class="hover:text-white transition-colors duration-200">Contact</a></li>
       </ul>
     </nav>
   </header>
 
   <!-- Main content - Centered Hero Text -->
-  <main class="min-h-screen flex items-center justify-center p-4 text-center">
-    <div class="space-y-6">
-      <h1 class="text-7xl md:text-8xl font-bold gradient-text">Pathorium</h1>
-      <p class="text-lg md:text-xl text-slate-400">Solutions for scientists.</p>
-      <a href="#services" class="inline-block px-8 py-3 rounded-full font-semibold text-white cta-button">
-        Explore Services
-      </a>
+  <main class="flex-grow flex items-center justify-center p-4 text-center">
+    <div class="space-y-8 max-w-4xl">
+      <h1 class="text-8xl md:text-9xl font-extrabold gradient-text">Pathorium</h1>
+      <p class="text-xl md:text-2xl text-slate-300 tracking-wide">Solutions for scientists.</p>
     </div>
   </main>
 
-  <!-- Our Mission section -->
-  <section id="mission" class="min-h-screen flex items-center justify-center text-center text-slate-400 border-t border-slate-700 py-16">
-    <div class="p-8">
-      <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">Our Mission</h2>
-      <p class="max-w-prose mx-auto">We are dedicated to providing cutting-edge solutions that empower scientists and accelerate discovery. Through innovative technology and collaborative platforms, we turn complex data into actionable insights, driving progress in every field of research.</p>
-    </div>
-  </section>
-  
-  <!-- Our Services section (Updated with 4 cards) -->
-  <section id="services" class="min-h-screen flex items-center justify-center text-center text-slate-400 border-t border-slate-700 py-16">
-    <div class="p-8 max-w-7xl mx-auto">
-        <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-12">Our Services & Tools</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Service Card 1 -->
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-blue-500 border border-transparent">
-                <div class="text-4xl mb-4 gradient-text">
-                    <i class="fas fa-microscope"></i>
-                </div>
-                <h3 class="text-2xl font-semibold text-white mb-2">Data Science</h3>
-                <p class="text-sm">We leverage advanced data analytics and machine learning to uncover hidden patterns and insights from your scientific data.</p>
-            </div>
-            <!-- Service Card 2 -->
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-green-500 border border-transparent">
-                <div class="text-4xl mb-4 gradient-text">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <h3 class="text-2xl font-semibold text-white mb-2">Lab Automation</h3>
-                <p class="text-sm">Automate repetitive lab processes with custom robotic solutions and software to increase efficiency and reduce human error.</p>
-            </div>
-            <!-- Service Card 3 -->
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-indigo-500 border border-transparent">
-                <div class="text-4xl mb-4 gradient-text">
-                    <i class="fas fa-flask"></i>
-                </div>
-                <h3 class="text-2xl font-semibold text-white mb-2">Consulting</h3>
-                <p class="text-sm">Our team of experts provides strategic guidance on research design, data management, and experimental workflows.</p>
-            </div>
-            <!-- NEW Service Card 4: Clinical Tools -->
-            <a href="HER2.html" class="bg-slate-800 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-red-500 border border-transparent flex flex-col justify-between">
-                <div>
-                    <div class="text-4xl mb-4 gradient-text">
-                        <i class="fas fa-vial-virus"></i>
-                    </div>
-                    <h3 class="text-2xl font-semibold text-white mb-2">Clinical Tools</h3>
-                    <p class="text-sm">Access specialized calculators and digital tools, like our HER2 ISH counter, for immediate diagnostic support.</p>
-                </div>
-                <span class="text-xs font-semibold mt-4 text-indigo-400">Launch Tool &rarr;</span>
-            </a>
-        </div>
-    </div>
-  </section>
-
   <!-- Footer -->
-  <footer class="p-4 text-center text-slate-400 text-xs mx-12 border-t border-slate-700">
+  <footer class="p-4 text-center text-slate-500 text-xs mx-12 border-t border-slate-900">
     <p>© B Pollard 2025 pathorium.com. All rights reserved.</p>
     <p>Pathorium 🧪 solutions for scientists</p>
   </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const gradientOverlay = document.getElementById('gradient-overlay');
-      const mainContent = document.querySelector('main');
-      const header = document.getElementById('header');
-
-      const updatePageOnScroll = () => {
-        const scrollPosition = window.scrollY;
-        const mainContentHeight = mainContent.offsetHeight;
-
-        // Fades the gradient background as the user scrolls
-        const opacity = 1 - Math.min(scrollPosition / mainContentHeight, 1);
-        const startColor = `rgba(17, 42, 61, ${opacity})`;
-        const middleColor = `rgba(6, 17, 31, ${opacity})`;
-        gradientOverlay.style.background = `radial-gradient(circle at center, ${startColor} 0%, ${middleColor} 99%, rgba(0,0,0,1) 100%)`;
-
-        // Adds or removes the "scrolled" class on the header
-        if (scrollPosition > 50) {
-          header.classList.add('scrolled-header');
-        } else {
-          header.classList.remove('scrolled-header');
-        }
-      };
-
-      // Set initial state and add scroll listener
-      updatePageOnScroll();
-      window.addEventListener('scroll', updatePageOnScroll);
-    });
-  </script>
-
 </body>
 
 </html>
-
-
-
-
-
